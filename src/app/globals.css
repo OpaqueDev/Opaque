@@ -34,6 +34,20 @@ body{background:#fff;color:#080810;font-family:'Inter',sans-serif;overflow-x:hid
 .bc{font-family:'Barlow Condensed',sans-serif}
 .mono{font-family:'Share Tech Mono',monospace}
 
+/* ── Premium scrollbar ───────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #07070f; }
+::-webkit-scrollbar-thumb { background: #0000FF; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #3355FF; }
+
+/* ── Glow utilities ──────────────────────────────────────── */
+.glow-blue { box-shadow: 0 0 20px rgba(0,0,255,0.3), 0 0 40px rgba(0,0,255,0.1); }
+.glow-text { text-shadow: 0 0 20px rgba(0,100,255,0.8), 0 0 40px rgba(0,0,255,0.4); }
+
+/* ── Smooth all transitions ──────────────────────────────── */
+button { transition: all 0.2s; }
+a { transition: color 0.15s; }
+
 /* GLITCH */
 @keyframes glitch{
   0%,90%,100%{transform:translate(0)}

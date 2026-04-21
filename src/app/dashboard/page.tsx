@@ -1,23 +1,33 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAccount } from "wagmi";
 import { ProofCard } from "@/components/ProofCard";
-import { Loader2 } from "lucide-react";
 
-// Loading drama messages - the WOW sequence
+// ─── Cinematic loading steps ───────────────────────────────────────────────────
 const LOADING_STEPS = [
-  "Handshaking with iExec Nox Enclave...",
-  "AES-256 encrypting portfolio inputs...",
-  "Computing inside SGX hardware boundary...",
-  "Generating SHA-256 deterministic proof...",
-  "Sealing result to Arbitrum Sepolia...",
+  { msg: "Encrypting portfolio inputs...", icon: "🔒" },
+  { msg: "Running confidential compute...", icon: "⬡" },
+  { msg: "Signing inside iExec Nox enclave...", icon: "⚡" },
+  { msg: "Generating deterministic proof...", icon: "◈" },
+  { msg: "Sealing result...", icon: "✦" },
 ];
 
+// ─── How It Works panel ────────────────────────────────────────────────────────
 const HOW_IT_WORKS = [
-  { n: "01", title: "Encrypt Data", body: "Your inputs never leave the local context. AES-256 encryption via iExec Nox public key before any network call.", icon: "🔒" },
-  { n: "02", title: "Compute Privately", body: "Calculation runs inside an Intel SGX hardware enclave. Even the node operator cannot read your portfolio values.", icon: "⬡" },
-  { n: "03", title: "Reveal Only Result", body: "Only the final PnL percentage exits the TEE. The raw balance stays permanently masked inside the enclave.", icon: "✦" },
+  {
+    n: "01", icon: "🔒", title: "Data is Encrypted",
+    body: "Inputs are sealed with AES-256 before leaving your device. Only the iExec Nox enclave holds the key.",
+  },
+  {
+    n: "02", icon: "⬡", title: "Compute Runs Privately",
+    body: "Computation happens inside an Intel SGX enclave. Zero visibility — not even the node operator can read your values.",
+  },
+  {
+    n: "03", icon: "✓", title: "Only Result is Revealed",
+    body: "The yield percentage exits the enclave. Your balance, positions, and wallet history stay completely hidden.",
+  },
 ];
 
 export default function ComputeVaultPage() {
@@ -38,13 +48,10 @@ export default function ComputeVaultPage() {
     setLoading(true);
     setResult(null);
     setLoadingStep(0);
-
-    // Loading drama: cycle through messages
     for (let i = 0; i < LOADING_STEPS.length; i++) {
       setLoadingStep(i);
-      await new Promise(r => setTimeout(r, 420));
+      await new Promise(r => setTimeout(r, 380));
     }
-
     try {
       const res = await fetch("/api/compute", {
         method: "POST",
@@ -53,185 +60,237 @@ export default function ComputeVaultPage() {
       });
       const data = await res.json();
       setResult(data);
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
     setLoading(false);
   };
 
   const handleDownload = async () => {
     if (!cardRef.current) return;
-    try {
-      const { default: html2canvas } = await import("html2canvas");
-      const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: "#05050a",
-        scale: 2,
-        useCORS: true,
-      });
-      const link = document.createElement("a");
-      link.download = `opaque-proof-${Date.now()}.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    } catch (e) {
-      console.error("Download failed", e);
-    }
+    const { default: html2canvas } = await import("html2canvas");
+    const canvas = await html2canvas(cardRef.current, { backgroundColor: "#04040d", scale: 2, useCORS: true });
+    const a = document.createElement("a");
+    a.download = `opaque-alpha-proof-${Date.now()}.png`;
+    a.href = canvas.toDataURL("image/png");
+    a.click();
   };
 
-  // ── SHARE / FULLSCREEN MODE ──────────────────────────────────────────────────
+  // ── Share / Alpha Card fullscreen ──────────────────────────────────────────
   if (shareMode && result) {
     return (
-      <div style={{ position: "fixed", inset: 0, zIndex: 100, background: "#080810", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px", gap: "20px" }}>
-        <div style={{ width: "100%", maxWidth: "520px", animation: "fade-in 0.5s ease" }}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        style={{ position: "fixed", inset: 0, zIndex: 100, background: "#04040d", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px" }}
+      >
+        <div style={{ width: "100%", maxWidth: "540px" }}>
+          {/* Instruction */}
+          <div className="mono" style={{ fontSize: "10px", color: "#555", letterSpacing: "2px", textAlign: "center", marginBottom: "20px" }}>
+            ALPHA CARD — READY TO SHARE
+          </div>
+
+          {/* Downloadable card */}
           <div ref={cardRef}>
             <ProofCard pnl={result.pnl} proof={result.proof} wallet={address!} />
           </div>
 
+          {/* Actions */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "20px" }}>
-            <button
-              className="mono"
+            <motion.button
+              whileHover={{ scale: 1.02, boxShadow: "0 0 30px rgba(0,0,255,0.5)" }}
+              whileTap={{ scale: 0.98 }}
               onClick={handleDownload}
-              style={{ padding: "14px", background: "#0000FF", color: "#fff", border: "none", fontSize: "12px", cursor: "pointer", letterSpacing: "1px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 0 20px rgba(0,0,255,0.4)" }}
+              className="mono"
+              style={{ padding: "16px", background: "#0000FF", color: "#fff", border: "none", fontSize: "12px", cursor: "pointer", letterSpacing: "1px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
             >
               ⬇ DOWNLOAD PNG
-            </button>
-            <button
-              className="mono"
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => {
-                if (!result) return;
-                const text = `🔒 OPAQUE PROTOCOL — Proof of Alpha\nYield: ${result.pnl} VERIFIED\nProof: 0x${result.proof.slice(0, 16)}...\n✓ Deterministic · iExec Nox TEE\nhttps://opaque.finance`;
-                navigator.clipboard.writeText(text).then(() => alert("Copied to clipboard!"));
+                const txt = `🔒 OPAQUE — Proof of Alpha\n\nVerified Yield: ${result.pnl}\nProof: 0x${result.proof.slice(0, 20)}...\n\n✓ Deterministic · iExec Nox TEE\n✓ Balance remains private\n\n#DeFi #ProofOfAlpha #OPAQUE`;
+                navigator.clipboard.writeText(txt);
               }}
-              style={{ padding: "14px", background: "transparent", color: "#fff", border: "1px solid #333", fontSize: "12px", cursor: "pointer", letterSpacing: "1px" }}
+              className="mono"
+              style={{ padding: "16px", background: "transparent", color: "#aaa", border: "1px solid #222", fontSize: "12px", cursor: "pointer", letterSpacing: "1px" }}
             >
-              📋 COPY AS TEXT
-            </button>
+              📋 COPY TEXT
+            </motion.button>
           </div>
-
-          <button className="mono" style={{ width: "100%", marginTop: "12px", padding: "12px", background: "transparent", color: "#555", border: "1px solid #1a1a1a", cursor: "pointer", fontSize: "11px" }} onClick={() => setShareMode(false)}>
-            ← BACK TO DASHBOARD
+          <button onClick={() => setShareMode(false)} className="mono" style={{ width: "100%", marginTop: "12px", padding: "12px", background: "transparent", color: "#333", border: "none", cursor: "pointer", fontSize: "11px" }}>
+            ← back to dashboard
           </button>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
-  // ── MAIN DASHBOARD VIEW ──────────────────────────────────────────────────────
+  // ── Main Dashboard view ────────────────────────────────────────────────────
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "64px", animation: "fade-in 0.3s ease" }}>
-      
-      {/* HOW IT WORKS — Confidential Compute Explain */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }} className="dash-grid-3col">
-        {HOW_IT_WORKS.map((step) => (
-          <div key={step.n} style={{ background: "#0a0a14", border: "1px solid #1a1a1a", padding: "20px", display: "flex", flexDirection: "column", gap: "10px", transition: "border-color 0.2s" }}
-            onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(0,0,255,0.4)")}
-            onMouseLeave={e => (e.currentTarget.style.borderColor = "#1a1a1a")}
+    <div style={{ display: "flex", flexDirection: "column", gap: "20px", marginBottom: "64px", animation: "fade-in 0.4s ease" }}>
+
+      {/* ── How It Works ─────────────────────────────────────────────────────── */}
+      <div className="dash-grid-3col">
+        {HOW_IT_WORKS.map((step, i) => (
+          <motion.div
+            key={step.n}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+            style={{ background: "#07070f", border: "1px solid #12121e", padding: "22px", cursor: "default", transition: "border-color 0.2s" }}
+            onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(0,0,255,0.35)")}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = "#12121e")}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-              <span style={{ fontSize: "20px" }}>{step.icon}</span>
-              <span className="mono" style={{ fontSize: "9px", color: "#0000FF", letterSpacing: "2px" }}>STEP {step.n}</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
+              <span style={{ fontSize: "18px" }}>{step.icon}</span>
+              <span className="mono" style={{ fontSize: "8px", color: "#0000FF", letterSpacing: "2px" }}>STEP {step.n}</span>
             </div>
-            <div className="bc" style={{ fontSize: "16px", color: "#fff", textTransform: "uppercase", letterSpacing: "0.5px" }}>{step.title}</div>
-            <div style={{ fontSize: "11px", color: "#666", lineHeight: 1.7 }}>{step.body}</div>
-          </div>
+            <div className="bc" style={{ fontSize: "16px", color: "#fff", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>{step.title}</div>
+            <div style={{ fontSize: "11px", color: "#555", lineHeight: 1.8 }}>{step.body}</div>
+          </motion.div>
         ))}
       </div>
 
-      {/* MAIN PANEL: Input + Proof Card */}
+      {/* ── Core iExec Nox note ───────────────────────────────────────────────── */}
+      <div className="mono" style={{ textAlign: "center", fontSize: "10px", color: "#222", letterSpacing: "2px" }}>
+        POWERED BY IEXEC NOX · INTEL SGX TRUSTED EXECUTION · SHA-256 ATTESTATION
+      </div>
+
+      {/* ── Input + Result ────────────────────────────────────────────────────── */}
       <div className="dash-grid-2">
-        {/* Left: Input Panel */}
-        <div style={{ background: "#111", border: "1px solid #222", padding: "40px", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: 0, right: 0, padding: "16px", color: "rgba(255,255,255,0.04)", fontSize: "120px", lineHeight: 0.5, pointerEvents: "none" }} className="bc">OPQ</div>
-          <h2 className="bc" style={{ fontSize: "28px", textTransform: "uppercase", marginBottom: "12px", letterSpacing: "1px" }}>Generate Proof</h2>
-          <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.5)", marginBottom: "32px", lineHeight: 1.6, position: "relative", zIndex: 1 }}>
-            iExec Nox masks your portfolio inputs. Calculate an auditable, trustless Proof of Alpha without leaking your balance to the Arbitrum chain.
+
+        {/* Left: Input panel */}
+        <div style={{ background: "#07070f", border: "1px solid #12121e", padding: "40px", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: 0, right: 0, padding: "16px", color: "rgba(0,0,255,0.04)", fontSize: "110px", lineHeight: 0.5, pointerEvents: "none", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900 }}>OPQ</div>
+
+          <h2 className="bc" style={{ fontSize: "26px", textTransform: "uppercase", marginBottom: "8px", letterSpacing: "1px", color: "#fff" }}>
+            Generate Proof of Alpha
+          </h2>
+          <p style={{ fontSize: "12px", color: "#444", marginBottom: "32px", lineHeight: 1.7, position: "relative", zIndex: 1 }}>
+            Prove your trading performance to anyone. Your actual balance stays hidden inside the enclave.
           </p>
 
           {!mounted || !isConnected ? (
-            <div style={{ padding: "40px", background: "rgba(0,0,255,0.05)", border: "1px dashed rgba(0,0,255,0.3)", textAlign: "center", color: "#0000FF", fontSize: "12px" }} className="mono">
-              [ WALLET CONNECTION REQUIRED ]
+            <div style={{ padding: "36px", background: "rgba(0,0,255,0.04)", border: "1px dashed rgba(0,0,255,0.2)", textAlign: "center", color: "#0000FF" }} className="mono">
+              <div style={{ fontSize: "18px", marginBottom: "8px" }}>◈</div>
+              <div style={{ fontSize: "11px", letterSpacing: "1px" }}>[ WALLET CONNECTION REQUIRED ]</div>
             </div>
           ) : (
             <div style={{ position: "relative", zIndex: 1 }}>
+              {/* Inputs */}
               <div style={{ display: "flex", gap: "12px", marginBottom: "16px" }}>
-                <div style={{ flex: 1 }}>
-                  <label className="bc" style={{ display: "block", fontSize: "10px", color: "#999", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }}>Initial Shielded Value (USD)</label>
-                  <input type="number" placeholder="e.g. 10000" value={initialValue} onChange={e => setInitialValue(e.target.value)}
-                    style={{ width: "100%", background: "#0a0a14", border: "1px solid #333", color: "#fff", padding: "16px", fontSize: "16px", outline: "none" }} className="mono" />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label className="bc" style={{ display: "block", fontSize: "10px", color: "#999", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }}>Final Evaluated Value (USD)</label>
-                  <input type="number" placeholder="e.g. 25000" value={finalValue} onChange={e => setFinalValue(e.target.value)}
-                    style={{ width: "100%", background: "#0a0a14", border: "1px solid #333", color: "#fff", padding: "16px", fontSize: "16px", outline: "none" }} className="mono" />
-                </div>
+                {[
+                  { label: "Initial Value (USD)", placeholder: "e.g. 10000", val: initialValue, set: setInitialValue },
+                  { label: "Final Value (USD)", placeholder: "e.g. 18430", val: finalValue, set: setFinalValue },
+                ].map(({ label, placeholder, val, set }) => (
+                  <div key={label} style={{ flex: 1 }}>
+                    <label className="bc" style={{ display: "block", fontSize: "9px", color: "#555", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }}>{label}</label>
+                    <input
+                      type="number" placeholder={placeholder} value={val}
+                      onChange={e => set(e.target.value)}
+                      disabled={loading}
+                      style={{ width: "100%", background: "#04040d", border: "1px solid #1a1a1a", borderBottom: "2px solid #0000FF", color: "#fff", padding: "14px 16px", fontSize: "18px", outline: "none", transition: "border-color 0.2s", fontFamily: "'Share Tech Mono', monospace" }}
+                      onFocus={e => { e.target.style.borderColor = "#0000FF"; e.target.style.boxShadow = "0 0 0 1px rgba(0,0,255,0.3)"; }}
+                      onBlur={e => { e.target.style.borderColor = "#1a1a1a"; e.target.style.borderBottomColor = "#0000FF"; e.target.style.boxShadow = "none"; }}
+                    />
+                  </div>
+                ))}
               </div>
 
-              <button
-                className="btn-primary"
+              {/* CTA Button */}
+              <motion.button
+                whileTap={{ scale: 0.98 }}
                 onClick={handleCompute}
                 disabled={loading || !initialValue || !finalValue}
-                style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", background: (loading || !initialValue || !finalValue) ? "#222" : "#0000FF", padding: "16px", cursor: (loading || !initialValue || !finalValue) ? "not-allowed" : "pointer", transition: "background 0.2s" }}
+                className="bc"
+                style={{
+                  width: "100%", padding: "18px",
+                  background: loading || !initialValue || !finalValue
+                    ? "#111" : "linear-gradient(135deg, #0000FF, #3355FF)",
+                  color: "#fff", border: "none",
+                  fontSize: "18px", letterSpacing: "1px", textTransform: "uppercase",
+                  cursor: loading || !initialValue || !finalValue ? "not-allowed" : "pointer",
+                  boxShadow: (!loading && initialValue && finalValue) ? "0 0 30px rgba(0,0,255,0.3)" : "none",
+                  transition: "all 0.2s",
+                }}
               >
-                {loading ? <><Loader2 size={16} className="animate-spin" /> COMPUTING...</> : "PROVE PnL →"}
-              </button>
+                {loading ? "COMPUTING..." : "GENERATE PROOF OF ALPHA →"}
+              </motion.button>
 
-              {/* LOADING DRAMA */}
-              {loading && (
-                <div style={{ marginTop: "16px", padding: "14px", background: "#0a0a0a", border: "1px solid rgba(0,0,255,0.2)" }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                    {LOADING_STEPS.map((msg, i) => (
-                      <div key={i} className="mono" style={{
-                        fontSize: "10px",
-                        color: i < loadingStep ? "#4ade80" : i === loadingStep ? "#fff" : "#333",
-                        display: "flex", alignItems: "center", gap: "8px",
-                        transition: "color 0.3s",
-                      }}>
-                        <span>{i < loadingStep ? "✓" : i === loadingStep ? "▶" : "○"}</span>
-                        {msg}
-                      </div>
-                    ))}
-                  </div>
-                  {/* Progress bar */}
-                  <div style={{ marginTop: "12px", height: "2px", background: "#1a1a1a" }}>
-                    <div style={{
-                      height: "100%",
-                      width: `${((loadingStep + 1) / LOADING_STEPS.length) * 100}%`,
-                      background: "#0000FF",
-                      transition: "width 0.4s ease",
-                      boxShadow: "0 0 8px rgba(0,0,255,0.6)",
-                    }} />
-                  </div>
-                </div>
-              )}
+              {/* Cinematic loading */}
+              <AnimatePresence>
+                {loading && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    style={{ marginTop: "16px", background: "#04040d", border: "1px solid #0d0d1a", padding: "16px", overflow: "hidden" }}
+                  >
+                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "12px" }}>
+                      {LOADING_STEPS.map((s, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: i <= loadingStep ? 1 : 0.2 }}
+                          className="mono"
+                          style={{ fontSize: "11px", display: "flex", alignItems: "center", gap: "10px",
+                            color: i < loadingStep ? "#4ade80" : i === loadingStep ? "#fff" : "#2a2a2a" }}
+                        >
+                          <span style={{ fontSize: "13px" }}>
+                            {i < loadingStep ? "✓" : i === loadingStep ? s.icon : "○"}
+                          </span>
+                          {s.msg}
+                        </motion.div>
+                      ))}
+                    </div>
+                    {/* Progress bar */}
+                    <div style={{ height: "2px", background: "#111", borderRadius: "1px" }}>
+                      <motion.div
+                        animate={{ width: `${((loadingStep + 1) / LOADING_STEPS.length) * 100}%` }}
+                        transition={{ duration: 0.35 }}
+                        style={{ height: "100%", background: "linear-gradient(90deg, #0000FF, #3355FF)", borderRadius: "1px", boxShadow: "0 0 8px rgba(0,0,255,0.6)" }}
+                      />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-              <div style={{ fontSize: "10px", color: "#555", marginTop: "12px" }} className="mono">
-                Data processed off-chain via iExec Nox TEE. 0% data leakage.
+              <div className="mono" style={{ fontSize: "9px", color: "#222", marginTop: "12px", textAlign: "center", letterSpacing: "1px" }}>
+                PROOF = SHA256(WALLET + INITIAL + PNL) · ZERO BALANCE DISCLOSURE
               </div>
             </div>
           )}
         </div>
 
-        {/* Right: Proof Card Panel */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,255,0.02)", border: "1px dashed #1a1a1a" }}>
-          {!result ? (
-            <div style={{ textAlign: "center", padding: "40px" }}>
-              <div style={{ width: "80px", height: "80px", border: "2px solid #222", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
-                <div style={{ color: "rgba(0,0,255,0.5)", fontSize: "24px" }}>⬡</div>
-              </div>
-              <h3 className="bc" style={{ fontSize: "20px", color: "#555", textTransform: "uppercase", letterSpacing: "1px" }}>Awaiting Compute...</h3>
-              <p className="mono" style={{ fontSize: "10px", color: "#333", marginTop: "8px" }}>Fill in your values and click PROVE PnL</p>
-            </div>
-          ) : (
-            <div style={{ width: "100%", padding: "24px", animation: "fade-in 0.5s ease" }}>
-              <ProofCard pnl={result.pnl} proof={result.proof} wallet={address!} />
-              <button
-                className="btn-primary bc"
-                onClick={() => setShareMode(true)}
-                style={{ width: "100%", marginTop: "16px", background: "#fff", color: "#0000FF", fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
-              >
-                📤 OPEN SHARE MODE ↗
-              </button>
-            </div>
-          )}
+        {/* Right: Proof Card result */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,255,0.01)", border: "1px dashed #0d0d1a", minHeight: "380px" }}>
+          <AnimatePresence mode="wait">
+            {!result ? (
+              <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ textAlign: "center", padding: "40px" }}>
+                <div className="bc" style={{ fontSize: "80px", color: "rgba(0,0,255,0.06)", lineHeight: 1, marginBottom: "16px" }}>⬡</div>
+                <div className="bc" style={{ fontSize: "18px", color: "#222", textTransform: "uppercase", letterSpacing: "2px" }}>Proof Pending</div>
+                <div className="mono" style={{ fontSize: "10px", color: "#1a1a1a", marginTop: "8px" }}>Enter values and generate your proof</div>
+              </motion.div>
+            ) : (
+              <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ width: "100%", padding: "24px" }}>
+                <ProofCard
+                  pnl={result.pnl}
+                  proof={result.proof}
+                  wallet={address!}
+                  onDownload={handleDownload}
+                />
+                <motion.button
+                  whileHover={{ scale: 1.01, boxShadow: "0 0 20px rgba(0,0,255,0.2)" }}
+                  whileTap={{ scale: 0.99 }}
+                  className="bc"
+                  onClick={() => setShareMode(true)}
+                  style={{ width: "100%", marginTop: "16px", padding: "16px", background: "#fff", color: "#0000FF", border: "none", fontSize: "17px", cursor: "pointer", letterSpacing: "1px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
+                >
+                  📤 OPEN SHARE MODE ↗
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>
