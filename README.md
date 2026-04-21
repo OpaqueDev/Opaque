@@ -27,7 +27,7 @@ Because we integrated the real **ChainGPT API** for the Analytics tab, you must 
 1. Create a file named `.env.local` EXACTLY in the root folder (`d:\opaque\.env.local`).
 2. Paste the following ChainGPT API Key inside:
 ```ini
-CHAINGPT_API_KEY="6ee6a784-6611-4af0-bb20-00c919958919"
+CHAINGPT_API_KEY=""
 ```
 
 > **Note:** If you run the app without this file, the API Route `POST /api/chaingpt` will crash and trigger the fallback UI.
