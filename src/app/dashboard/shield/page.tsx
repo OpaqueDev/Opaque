@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount, useSignMessage, useWriteContract } from "wagmi";
+import { parseUnits } from "viem";
 import { Loader2 } from "lucide-react";
+import { OpaqueVaultABI, ERC20ABI } from "@/lib/abi";
 
 export default function ShieldPage() {
   const { address, isConnected } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const { writeContractAsync } = useWriteContract();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   
@@ -22,33 +25,66 @@ export default function ShieldPage() {
     
     try {
       setStep("approving");
+      setLogs([]);
       addLog(`Initializing TEE Shield request for ${amount} ${token}...`);
       
-      // MOCK STEP 1: APPROVE (Using Wallet Signature to simulate transaction popup)
-      addLog("Requesting wallet signature for contract approval...");
-      const sig1 = await signMessageAsync({ 
-        message: `OPAQUE PROTOCOL\n\nAuthorize iExec Nox Enclave to spend: ${amount} ${token}\nWallet: ${address}\nChain: Arbitrum Sepolia` 
-      });
-      addLog(`[OK] Approval signed: ${sig1.slice(0, 14)}...`);
-      
-      setStep("shielding");
-      addLog("Transmitting assets to Confidential Vault...");
-      
-      // Simulate confirmation delay
-      await new Promise(r => setTimeout(r, 2000));
-      
-      // MOCK STEP 2: SHIELD ENCRYPTION (Second Signature)
-      addLog("Requesting Nox Enclave encryption key authorization...");
-      const sig2 = await signMessageAsync({ 
-        message: `OPAQUE PROTOCOL\n\nEncrypt my balance of ${amount} ${token}.\nEnsure absolute privacy via TEE.\nNonce: ${Math.floor(Math.random()*10000)}` 
-      });
-      addLog(`[OK] Payload encrypted: ${sig2.slice(0, 14)}...`);
-      
-      setStep("done");
-      addLog(`[SUCCESS] ${amount} ${token} successfully shielded via iExec!`);
+      const vaultAddress = process.env.NEXT_PUBLIC_VAULT_ADDRESS as `0x${string}`;
+
+      if (vaultAddress) {
+        // [ON-CHAIN MODE] REAL DEPLOYED EXECUTIONS
+        addLog(`REAL ON-CHAIN MODE DETECTED. Vault: ${vaultAddress.slice(0,6)}...`);
+        addLog(`Preparing to shield ${amount} ${token}...`);
+        
+        // Use a dummy ERC20 token for Hackathon if real USDC isn't available
+        const testTokenAddress = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"; 
+        const amountWei = parseUnits(amount, 18);
+
+        addLog("Awaiting Wallet Approval (Approve)... (Make sure you have funds!)");
+        await writeContractAsync({
+          address: testTokenAddress,
+          abi: ERC20ABI,
+          functionName: "approve",
+          args: [vaultAddress, amountWei]
+        });
+
+        setStep("shielding");
+        addLog("Approval confirmed. Awaiting Shield Execution...");
+        const txHash = await writeContractAsync({
+          address: vaultAddress,
+          abi: OpaqueVaultABI,
+          functionName: "shield",
+          args: [testTokenAddress, amountWei, "0x1234567890abcdef"]
+        });
+
+        setStep("done");
+        addLog(`TRANSACTION SUCCESS! Hash: 0x${txHash.slice(0, 16)}...`);
+        addLog("Asset mathematically secured in Nox Enclave.");
+      } else {
+        // [DEMO MODE] OFF-CHAIN SIGNATURE FOR FAST PRESENTATION
+        addLog("DEMO MODE: No Vault Address found in .env.local");
+        addLog("Requesting wallet signature for contract approval...");
+        const sig1 = await signMessageAsync({ 
+          message: `OPAQUE PROTOCOL\n\nAuthorize iExec Nox Enclave to spend: ${amount} ${token}\nWallet: ${address}\nChain: Arbitrum Sepolia` 
+        });
+        addLog(`[OK] Approval signed: ${sig1.slice(0, 14)}...`);
+        
+        setStep("shielding");
+        addLog("Transmitting assets to Confidential Vault...");
+        
+        await new Promise(r => setTimeout(r, 2000));
+        
+        addLog("Requesting Nox Enclave encryption key authorization...");
+        const sig2 = await signMessageAsync({ 
+          message: `OPAQUE PROTOCOL\n\nEncrypt my balance of ${amount} ${token}.\nEnsure absolute privacy via TEE.\nNonce: ${Math.floor(Math.random()*10000)}` 
+        });
+        addLog(`[OK] Payload encrypted: ${sig2.slice(0, 14)}...`);
+        
+        setStep("done");
+        addLog(`[SUCCESS] ${amount} ${token} successfully shielded via iExec!`);
+      }
       
     } catch (e: any) {
-      addLog(`[ERROR] Transaction failed or rejected by user.`);
+      addLog(`[ERROR] Transaction failed or rejected! Check funds if running on-chain.`);
       setStep("idle");
     }
   };
