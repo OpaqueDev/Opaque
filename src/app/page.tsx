@@ -48,8 +48,8 @@ export default function Home() {
         <div className="hero-left">
           <div>
             <div className="hero-tag">Arbitrum Sepolia · iExec Nox · ChainGPT</div>
-            <h1 className="hero-h1">Bold<br/>Privacy<br/><em>For Big</em><br/>Trades.</h1>
-            <p className="hero-sub" style={{ marginBottom: "24px" }}>Privacy-first DeFi analytics powered by iExec's confidential computing. Your PnL is public proof. Your balance stays encrypted — forever.</p>
+            <h1 className="hero-h1">Prove<br/>Your Profit.<br/><em>Hide</em><br/>Your Balance.</h1>
+            <p className="hero-sub" style={{ marginBottom: "24px" }}>The first DeFi protocol where you can share verified trading performance — without leaking a single number from your portfolio.</p>
             
             <div className="hero-actions">
               <Link href="/dashboard" className="btn-primary" style={{ textDecoration: "none" }}>Enter App ↗</Link>
