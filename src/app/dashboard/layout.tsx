@@ -103,6 +103,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .mobile-overlay { display: none; }
         .dash-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
         .dash-grid-2fr { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; }
+        .dash-grid-3col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
         
         @media (max-width: 900px) {
           .dash-sidebar { position: fixed; height: 100vh; left: 0; top: 0; transform: translateX(-100%); z-index: 50; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -111,7 +112,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           .hamburger-btn { display: flex; align-items: center; justify-content: center; background: #0000FF; border: none; color: #fff; width: 44px; height: 44px; cursor: pointer; border-radius: 4px; flex-shrink: 0; }
           .mobile-overlay.open { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 40; backdrop-filter: blur(4px); }
           .dash-header-wrap { flex-direction: column; align-items: flex-start !important; gap: 20px; }
-          .dash-grid-2, .dash-grid-2fr { grid-template-columns: 1fr; gap: 24px; }
+          .dash-grid-2, .dash-grid-2fr, .dash-grid-3col { grid-template-columns: 1fr; gap: 24px; }
         }
       `}} />
     </div>

@@ -12,6 +12,7 @@
     "@openzeppelin/contracts": "^5.6.1",
     "@tanstack/react-query": "^5.99.2",
     "framer-motion": "^12.38.0",
+    "html2canvas": "^1.4.1",
     "iexec": "^8.24.0",
     "lucide-react": "^1.8.0",
     "next": "16.2.4",
