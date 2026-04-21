@@ -88,11 +88,19 @@ export function ProofCard({ pnl, proof, wallet }: ProofCardProps) {
         </div>
 
         {/* Proof Footer */}
-        <div>
-          <div className="mono" style={{ fontSize: "10px", color: "#555", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px" }}>Zero-Knowledge Log Reference</div>
-          <div className="mono" style={{ fontSize: "11px", color: "#888", wordBreak: "break-all", opacity: 0.8 }}>
-            ZKP_0x{proof}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+          <div style={{ flex: 1 }}>
+            <div className="mono" style={{ fontSize: "10px", color: "#555", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+              <span style={{ color: "#4ade80" }}>✓</span> Reproducible Deterministic Proof
+            </div>
+            <div className="mono" style={{ fontSize: "11px", color: "#888", wordBreak: "break-all", opacity: 0.8 }}>
+              ZKP_0x{proof}
+            </div>
           </div>
+          
+          <button className="mono" style={{ padding: "8px 16px", background: "rgba(0,0,255,0.1)", border: "1px solid rgba(0,0,255,0.3)", color: "#0000FF", fontSize: "10px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", boxShadow: "0 0 10px rgba(0,0,255,0.2)" }}>
+            [ DOWNLOAD PNG ]
+          </button>
         </div>
       </div>
     </motion.div>

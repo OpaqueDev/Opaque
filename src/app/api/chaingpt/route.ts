@@ -8,7 +8,29 @@ export async function POST(req: Request) {
       throw new Error("Missing CHAINGPT_API_KEY environment variable. Please check .env.local");
     }
     
-    // Using standard ChainGPT Chat Completion Endpoint
+    const body = await req.json().catch(() => ({}));
+    const question = body?.question;
+
+    // CHAT MODE: user asked a specific question
+    if (question) {
+      const chatRes = await fetch("https://api.chaingpt.org/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: "You are ChainGPT, a blockchain and DeFi risk AI assistant embedded in OPAQUE Protocol — a confidential computing DeFi platform built on iExec Nox TEE and Arbitrum. Answer concisely in 2-3 sentences max. Be technical but clear." },
+            { role: "user", content: question }
+          ],
+          temperature: 0.5
+        })
+      });
+      const chatData = await chatRes.json();
+      if (!chatRes.ok) throw new Error(chatData.error?.message || "Chat API error");
+      return NextResponse.json({ answer: chatData.choices[0].message.content });
+    }
+
+    // AUDIT MODE: portfolio risk evaluation (existing flow)
     const response = await fetch("https://api.chaingpt.org/v1/chat/completions", {
       method: "POST",
       headers: {

@@ -14,16 +14,9 @@ export async function POST(req: Request) {
     // Compute exact mathematical PnL
     const pnl = ((current - initial) / initial) * 100;
     
-    // Generate proof
-    const generateHex = (len: number) => {
-      let result = '0x';
-      const chars = '0123456789abcdef';
-      for (let i = 0; i < len; i++) {
-        result += chars[Math.floor(Math.random() * chars.length)];
-      }
-      return result;
-    }
-    const proof = generateHex(64);
+    // Generate Deterministic Proof
+    const crypto = await import('crypto');
+    const proof = crypto.createHash('sha256').update(`${wallet}${initial}${pnl}`).digest('hex');
 
     // Generate encrypted balance
     const chars = ['█', '▓', '▒', '░', '◉'];

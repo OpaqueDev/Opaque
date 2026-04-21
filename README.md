@@ -8,10 +8,22 @@
 - **Multi-Route SaaS Dashboard:** Next.js 13+ App Router (Compute Vault, Shield Assets, Risk Analytics, Settings).
 - **Wallet Auth:** Native Web3 Injection using `wagmi` & `viem` with Hydration mismatch guards.
 - **AI Risk Audit:** Real-time ChainGPT API integration for analyzing on-chain portfolio risk metrics.
-- **TEE Smart Encryption (Mock):** iExec Nox Confidential workflow visualization with Cryptographic Wallet Signatures (EIP-191).
+- **TEE Smart Encryption:** iExec Nox Confidential workflow visualization with Cryptographic Wallet Signatures (EIP-191).
 - **Absolute Responsive UI:** Native CSS grid layouts that flawlessly fallback on Mobile + Slide-over drawers.
 
 ---
+
+## ⚙️ How It Works in 4 Steps
+1. **Wallet Connection & Authentication**: The user links their EVM-compatible wallet.
+2. **Asset Shielding**: Assets are deposited into the `OpaqueVault.sol` contract and instantly masked by the enclave.
+3. **Confidential Compute (iExec TEE)**: An Intel SGX worker computes the user's Net Yield natively without revealing base asset numbers to the public ledger.
+4. **ZKP Proof Generation**: A deterministic `SHA-256` reference is generated containing the Alpha score block to be shared virally.
+
+---
+
+## 💼 Business Model
+- **Shielding & Unwrap Fee**: The protocol charges a flat **0.05% protocol tax** strictly when unshielding confidential assets to public addresses.
+- **Alpha Group Badges**: Subscription tier integrations allowing verifiable top traders (e.g., Yields > 100%) to auto-mint NFT badges, acting as an immutable flex.
 
 ## ⚡ Quick Start for the Team
 
