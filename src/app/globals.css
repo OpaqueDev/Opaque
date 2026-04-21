@@ -16,6 +16,20 @@
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--blue:#0000FF;--white:#fff;--dark:#080810;--gray:#f2f2f2}
 html{scroll-behavior:smooth}
+/* Disable ugly native number spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+select option {
+  background: #05050a;
+  color: #fff;
+  padding: 12px;
+}
 body{background:#fff;color:#080810;font-family:'Inter',sans-serif;overflow-x:hidden}
 .bc{font-family:'Barlow Condensed',sans-serif}
 .mono{font-family:'Share Tech Mono',monospace}

@@ -10,6 +10,7 @@ export default function ComputeVaultPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const [initialValue, setInitialValue] = useState("");
+  const [finalValue, setFinalValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{pnl: string, proof: string} | null>(null);
   const [shareMode, setShareMode] = useState(false);
@@ -21,7 +22,7 @@ export default function ComputeVaultPage() {
       const res = await fetch("/api/compute", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ initial: parseFloat(initialValue), wallet: address })
+        body: JSON.stringify({ initial: Number(initialValue), final: Number(finalValue), wallet: address })
       });
       const data = await res.json();
       setResult(data);
@@ -63,23 +64,41 @@ export default function ComputeVaultPage() {
           </div>
         ) : (
           <div style={{ position: "relative", zIndex: 1 }}>
-            <label style={{ display: "block", fontSize: "12px", color: "#999", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }} className="bc">
-              Initial Shielded Value (USD)
-            </label>
+            <div style={{ display: "flex", gap: "12px", marginBottom: "16px" }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: "block", fontSize: "10px", color: "#999", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }} className="bc">
+                  Initial Shielded Value (USD)
+                </label>
+                <input 
+                  type="number" 
+                  placeholder="e.g. 10000"
+                  value={initialValue}
+                  onChange={e => setInitialValue(e.target.value)}
+                  style={{ width: "100%", background: "#0a0a14", border: "1px solid #333", color: "#fff", padding: "16px", fontSize: "16px", outline: "none" }}
+                  className="mono"
+                />
+              </div>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: "block", fontSize: "10px", color: "#999", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "1px" }} className="bc">
+                  Final Evaluated Value (USD)
+                </label>
+                <input 
+                  type="number" 
+                  placeholder="e.g. 25000"
+                  value={finalValue}
+                  onChange={e => setFinalValue(e.target.value)}
+                  style={{ width: "100%", background: "#0a0a14", border: "1px solid #333", color: "#fff", padding: "16px", fontSize: "16px", outline: "none" }}
+                  className="mono"
+                />
+              </div>
+            </div>
+
             <div style={{ display: "flex", gap: "12px" }}>
-              <input 
-                type="number" 
-                placeholder="e.g. 15000"
-                value={initialValue}
-                onChange={e => setInitialValue(e.target.value)}
-                style={{ flex: 1, background: "#0a0a14", border: "1px solid #333", color: "#fff", padding: "16px", fontSize: "16px", outline: "none" }}
-                className="mono"
-              />
               <button 
                 className="btn-primary" 
                 onClick={handleCompute}
-                disabled={loading || !initialValue}
-                style={{ display: "flex", alignItems: "center", gap: "8px", background: loading ? "#333" : "#0000FF", padding: "0 24px" }}
+                disabled={loading || !initialValue || !finalValue}
+                style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", background: (loading || !initialValue || !finalValue) ? "#333" : "#0000FF", padding: "16px", cursor: (loading || !initialValue || !finalValue) ? "not-allowed" : "pointer" }}
               >
                 {loading ? <Loader2 size={16} className="animate-spin" /> : "PROVE PnL →"}
               </button>
