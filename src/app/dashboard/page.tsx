@@ -7,11 +7,9 @@ import { ProofCard } from "@/components/ProofCard";
 
 // ─── Cinematic loading steps ───────────────────────────────────────────────────
 const LOADING_STEPS = [
-  { msg: "Encrypting portfolio inputs...", icon: "🔒" },
+  { msg: "Encrypting portfolio...", icon: "🔒" },
   { msg: "Running confidential compute...", icon: "⬡" },
-  { msg: "Signing inside iExec Nox enclave...", icon: "⚡" },
-  { msg: "Generating deterministic proof...", icon: "◈" },
-  { msg: "Sealing result...", icon: "✦" },
+  { msg: "Generating proof...", icon: "◈" }
 ];
 
 // ─── How It Works panel ────────────────────────────────────────────────────────
@@ -50,7 +48,7 @@ export default function ComputeVaultPage() {
     setLoadingStep(0);
     for (let i = 0; i < LOADING_STEPS.length; i++) {
       setLoadingStep(i);
-      await new Promise(r => setTimeout(r, 380));
+      await new Promise(r => setTimeout(r, 600));
     }
     try {
       const res = await fetch("/api/compute", {
