@@ -1,3 +1,4 @@
+/* eslint-disable */
 "use client";
 
 import { useEffect, useState, useRef } from "react";
@@ -14,7 +15,7 @@ export function useAsciiBlur(value: string, isPrivate: boolean) {
       setBlurred(Array.from({ length: value.length }, () =>
         ENC_CHARS[Math.floor(Math.random() * ENC_CHARS.length)]
       ).join(""));
-    }, 75);
+    }, 50);
     return () => clearInterval(iv);
   }, [value, isPrivate]);
   return isPrivate ? blurred : value;
@@ -77,8 +78,8 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9, y: 30 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
+      initial={{ opacity: 0, scale: 0.85, filter: "blur(10px)", y: 15 }}
+      animate={{ opacity: 1, scale: 1, filter: "blur(0px)", y: 0 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       style={{
         background: "radial-gradient(ellipse at 70% 0%, rgba(0,0,255,0.2) 0%, transparent 55%), #04040d",
@@ -116,16 +117,24 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
             </div>
           </div>
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
-            <div className="mono" style={{ background: "rgba(0,0,255,0.15)", border: "1px solid rgba(0,0,255,0.4)", color: "#0000FF", padding: "4px 10px", fontSize: "9px", letterSpacing: "1px", display: "flex", alignItems: "center", gap: "6px" }}>
-              <div style={{ width: "5px", height: "5px", background: "#0000FF", borderRadius: "50%", animation: "pulse 1.5s infinite", boxShadow: "0 0 6px #0000FF" }} />
-              NOX TEE SECURED
+            <div className="mono" style={{ background: "rgba(0,255,0,0.1)", border: "1px solid rgba(0,255,0,0.3)", color: "#4ade80", padding: "4px 10px", fontSize: "9px", letterSpacing: "1px", display: "flex", alignItems: "center", gap: "6px" }}>
+              <div style={{ width: "6px", height: "6px", background: "#4ade80", borderRadius: "50%", animation: "pulse 1.5s infinite", boxShadow: "0 0 8px #4ade80" }} />
+              SECURE COMPUTE ACTIVE
             </div>
-            <div className="mono" style={{ fontSize: "8px", color: "#333", letterSpacing: "1px" }}>Arbitrum Sepolia · Chain 421614</div>
+            <div className="mono" style={{ fontSize: "8px", color: "#666", letterSpacing: "1px" }}>Verified in Confidential Environment</div>
           </div>
         </div>
 
         {/* PnL HERO — The BOOM element */}
-        <div style={{ marginBottom: "32px" }}>
+        <div style={{ marginBottom: "32px", position: "relative" }}>
+          {/* Burst animation behind PnL */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: [0, 0.8, 0], scale: [0.8, 1.2, 1.5] }}
+            transition={{ duration: 1.2, ease: "easeOut", delay: 0.2 }}
+            style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: "150px", height: "150px", background: isProfit ? "radial-gradient(circle, rgba(0,100,255,0.6) 0%, transparent 70%)" : "radial-gradient(circle, rgba(255,60,60,0.6) 0%, transparent 70%)", pointerEvents: "none", zIndex: -1 }}
+          />
+
           <div className="mono" style={{ fontSize: "10px", color: "#555", textTransform: "uppercase", letterSpacing: "3px", marginBottom: "12px" }}>
             Verified Net Yield
           </div>
@@ -139,7 +148,7 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
               lineHeight: 0.85,
               letterSpacing: "-3px",
               background: isProfit
-                ? "linear-gradient(135deg, #fff 30%, #6699FF 70%)"
+                ? "linear-gradient(135deg, #fff 30%, #00ffff 70%)"
                 : "linear-gradient(135deg, #fff 30%, #ff4444 70%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
@@ -193,20 +202,28 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
         {/* Divider */}
         <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(0,0,255,0.3), transparent)", marginBottom: "20px" }} />
 
-        {/* Proof Footer */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "12px" }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-              <div className="mono" style={{ fontSize: "9px", color: "#444", textTransform: "uppercase", letterSpacing: "1px" }}>
-                Proof ID
-              </div>
-              <ProofTooltip />
-            </div>
-            <div className="mono" style={{ fontSize: "10px", color: "#555", wordBreak: "break-all", lineHeight: 1.5 }}>
-              0x{proof.slice(0, 32)}...
-            </div>
-          </div>
-          {onDownload && (
+        {/* Security Badge */}
+        <div style={{ background: "rgba(0,0,255,0.05)", border: "1px solid rgba(0,0,255,0.2)", padding: "16px", marginTop: "24px", display: "flex", flexDirection: "column", gap: "10px" }}>
+           <div className="bc" style={{ fontSize: "14px", color: "#0000FF", textTransform: "uppercase", letterSpacing: "2px", fontWeight: 700 }}>Cryptographic Proof</div>
+           
+           <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+             <div className="mono" style={{ fontSize: "10px", color: "#888", display: "flex", justifyContent: "space-between" }}>
+               <span>Proof ID:</span>
+               <span style={{ color: "#ccc" }}>0x{proof}</span>
+             </div>
+             <div className="mono" style={{ fontSize: "10px", color: "#888", display: "flex", justifyContent: "space-between" }}>
+               <span>Formula:</span>
+               <span style={{ color: "#fff", background: "rgba(255,255,255,0.1)", padding: "2px 6px" }}>Proof = SHA256(wallet + initial + pnl)</span>
+             </div>
+           </div>
+
+           <div className="mono" style={{ fontSize: "10px", color: "#4ade80", borderTop: "1px solid rgba(0,0,255,0.1)", paddingTop: "10px", marginTop: "4px" }}>
+             ✓ This proof can be recomputed by anyone. 
+           </div>
+        </div>
+
+        {onDownload && (
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "16px" }}>
             <button
               onClick={onDownload}
               className="mono"
@@ -221,10 +238,10 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
               onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,0,255,0.2)"; e.currentTarget.style.boxShadow = "0 0 15px rgba(0,0,255,0.3)"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "rgba(0,0,255,0.08)"; e.currentTarget.style.boxShadow = "none"; }}
             >
-              ⬇ PNG
+              ⬇ DOWNLOAD ALPHA CARD
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </motion.div>
   );

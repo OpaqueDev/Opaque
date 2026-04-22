@@ -98,7 +98,7 @@ export default function ComputeVaultPage() {
               whileTap={{ scale: 0.98 }}
               onClick={handleDownload}
               className="mono"
-              style={{ padding: "16px", background: "#0000FF", color: "#fff", border: "none", fontSize: "12px", cursor: "pointer", letterSpacing: "1px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
+              style={{ padding: "16px", background: "#0000FF", color: "var(--text-primary)", border: "none", fontSize: "12px", cursor: "pointer", letterSpacing: "1px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
             >
               ⬇ DOWNLOAD PNG
             </motion.button>
@@ -127,25 +127,27 @@ export default function ComputeVaultPage() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px", marginBottom: "64px", animation: "fade-in 0.4s ease" }}>
 
-      {/* ── How It Works ─────────────────────────────────────────────────────── */}
-      <div className="dash-grid-3col">
+      {/* ── How It Works Visual Flow ────────────────────────────────────────── */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(0,0,255,0.02)", border: "1px solid #12121e", padding: "32px", gap: "16px", overflowX: "auto" }}>
         {HOW_IT_WORKS.map((step, i) => (
-          <motion.div
-            key={step.n}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            style={{ background: "#07070f", border: "1px solid #12121e", padding: "22px", cursor: "default", transition: "border-color 0.2s" }}
-            onMouseEnter={e => (e.currentTarget.style.borderColor = "rgba(0,0,255,0.35)")}
-            onMouseLeave={e => (e.currentTarget.style.borderColor = "#12121e")}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px" }}>
-              <span style={{ fontSize: "18px" }}>{step.icon}</span>
-              <span className="mono" style={{ fontSize: "8px", color: "#0000FF", letterSpacing: "2px" }}>STEP {step.n}</span>
-            </div>
-            <div className="bc" style={{ fontSize: "16px", color: "#fff", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "8px" }}>{step.title}</div>
-            <div style={{ fontSize: "11px", color: "#555", lineHeight: 1.8 }}>{step.body}</div>
-          </motion.div>
+          <div key={step.n} style={{ display: "flex", alignItems: "center", flex: 1 }}>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              style={{ padding: "20px", flex: 1, position: "relative" }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
+                <span style={{ fontSize: "20px", color: i === 2 ? "#4ade80" : "#fff" }}>{step.icon}</span>
+                <span className="bc" style={{ fontSize: "16px", color: "var(--text-primary)", textTransform: "uppercase", letterSpacing: "1px" }}>{step.title}</span>
+              </div>
+              <div style={{ fontSize: "11px", color: "#666", lineHeight: 1.6, maxWidth: "240px" }}>{step.body}</div>
+            </motion.div>
+            
+            {i < HOW_IT_WORKS.length - 1 && (
+              <div style={{ padding: "0 16px", color: "#0000FF", opacity: 0.5 }}>→</div>
+            )}
+          </div>
         ))}
       </div>
 
@@ -161,7 +163,7 @@ export default function ComputeVaultPage() {
         <div style={{ background: "#07070f", border: "1px solid #12121e", padding: "40px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: 0, right: 0, padding: "16px", color: "rgba(0,0,255,0.04)", fontSize: "110px", lineHeight: 0.5, pointerEvents: "none", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900 }}>OPQ</div>
 
-          <h2 className="bc" style={{ fontSize: "26px", textTransform: "uppercase", marginBottom: "8px", letterSpacing: "1px", color: "#fff" }}>
+          <h2 className="bc" style={{ fontSize: "26px", textTransform: "uppercase", marginBottom: "8px", letterSpacing: "1px", color: "var(--text-primary)" }}>
             Generate Proof of Alpha
           </h2>
           <p style={{ fontSize: "12px", color: "#444", marginBottom: "32px", lineHeight: 1.7, position: "relative", zIndex: 1 }}>
@@ -187,7 +189,7 @@ export default function ComputeVaultPage() {
                       type="number" placeholder={placeholder} value={val}
                       onChange={e => set(e.target.value)}
                       disabled={loading}
-                      style={{ width: "100%", background: "#04040d", border: "1px solid #1a1a1a", borderBottom: "2px solid #0000FF", color: "#fff", padding: "14px 16px", fontSize: "18px", outline: "none", transition: "border-color 0.2s", fontFamily: "'Share Tech Mono', monospace" }}
+                      style={{ width: "100%", background: "#04040d", border: "1px solid #1a1a1a", borderBottom: "2px solid #0000FF", color: "var(--text-primary)", padding: "14px 16px", fontSize: "18px", outline: "none", transition: "border-color 0.2s", fontFamily: "'Share Tech Mono', monospace" }}
                       onFocus={e => { e.target.style.borderColor = "#0000FF"; e.target.style.boxShadow = "0 0 0 1px rgba(0,0,255,0.3)"; }}
                       onBlur={e => { e.target.style.borderColor = "#1a1a1a"; e.target.style.borderBottomColor = "#0000FF"; e.target.style.boxShadow = "none"; }}
                     />
@@ -205,7 +207,7 @@ export default function ComputeVaultPage() {
                   width: "100%", padding: "18px",
                   background: loading || !initialValue || !finalValue
                     ? "#111" : "linear-gradient(135deg, #0000FF, #3355FF)",
-                  color: "#fff", border: "none",
+                  color: "var(--text-primary)", border: "none",
                   fontSize: "18px", letterSpacing: "1px", textTransform: "uppercase",
                   cursor: loading || !initialValue || !finalValue ? "not-allowed" : "pointer",
                   boxShadow: (!loading && initialValue && finalValue) ? "0 0 30px rgba(0,0,255,0.3)" : "none",
@@ -215,45 +217,57 @@ export default function ComputeVaultPage() {
                 {loading ? "COMPUTING..." : "GENERATE PROOF OF ALPHA →"}
               </motion.button>
 
-              {/* Cinematic loading */}
+              {/* Cinematic loading Drop Backdrop & UI */}
               <AnimatePresence>
                 {loading && (
                   <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    style={{ marginTop: "16px", background: "#04040d", border: "1px solid #0d0d1a", padding: "16px", overflow: "hidden" }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 50, backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center" }}
                   >
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "12px" }}>
-                      {LOADING_STEPS.map((s, i) => (
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.9, opacity: 0 }}
+                      style={{ background: "#04040d", border: "1px solid #0000FF", padding: "40px", width: "400px", boxShadow: "0 0 50px rgba(0,0,255,0.2)" }}
+                    >
+                      <div className="bc" style={{ fontSize: "20px", color: "#fff", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "24px", textAlign: "center" }}>
+                        Confidential Compute
+                      </div>
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "32px" }}>
+                        {LOADING_STEPS.map((s, i) => (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: i <= loadingStep ? 1 : 0.2, x: 0 }}
+                            className="mono"
+                            style={{ fontSize: "13px", display: "flex", alignItems: "center", gap: "12px",
+                              color: i < loadingStep ? "#4ade80" : i === loadingStep ? "#fff" : "#444" }}
+                          >
+                            <span style={{ fontSize: "16px", display: "inline-block", width: "20px", textAlign: "center" }}>
+                              {i < loadingStep ? "✓" : i === loadingStep ? <span style={{ animation: "pulse 1s infinite" }}>{s.icon}</span> : "○"}
+                            </span>
+                            {s.msg}
+                          </motion.div>
+                        ))}
+                      </div>
+                      
+                      {/* Pulse Loader */}
+                      <div style={{ height: "2px", background: "#111", borderRadius: "1px", overflow: "hidden" }}>
                         <motion.div
-                          key={i}
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: i <= loadingStep ? 1 : 0.2 }}
-                          className="mono"
-                          style={{ fontSize: "11px", display: "flex", alignItems: "center", gap: "10px",
-                            color: i < loadingStep ? "#4ade80" : i === loadingStep ? "#fff" : "#2a2a2a" }}
-                        >
-                          <span style={{ fontSize: "13px" }}>
-                            {i < loadingStep ? "✓" : i === loadingStep ? s.icon : "○"}
-                          </span>
-                          {s.msg}
-                        </motion.div>
-                      ))}
-                    </div>
-                    {/* Progress bar */}
-                    <div style={{ height: "2px", background: "#111", borderRadius: "1px" }}>
-                      <motion.div
-                        animate={{ width: `${((loadingStep + 1) / LOADING_STEPS.length) * 100}%` }}
-                        transition={{ duration: 0.35 }}
-                        style={{ height: "100%", background: "linear-gradient(90deg, #0000FF, #3355FF)", borderRadius: "1px", boxShadow: "0 0 8px rgba(0,0,255,0.6)" }}
-                      />
-                    </div>
+                          animate={{ width: `${((loadingStep + 1) / LOADING_STEPS.length) * 100}%` }}
+                          transition={{ duration: 0.4 }}
+                          style={{ height: "100%", background: "linear-gradient(90deg, #0000FF, #00ffff)", boxShadow: "0 0 10px rgba(0,255,255,0.8)" }}
+                        />
+                      </div>
+                    </motion.div>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              <div className="mono" style={{ fontSize: "9px", color: "#222", marginTop: "12px", textAlign: "center", letterSpacing: "1px" }}>
+              <div className="mono" style={{ fontSize: "9px", color: "#333", marginTop: "12px", textAlign: "center", letterSpacing: "1px" }}>
                 PROOF = SHA256(WALLET + INITIAL + PNL) · ZERO BALANCE DISCLOSURE
               </div>
             </div>
