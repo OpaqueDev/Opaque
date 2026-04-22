@@ -54,7 +54,7 @@ contract OpaqueVault is Ownable {
      * @param recipient The stealth or mapped recipient address.
      * @param token The ERC20 token to unshield.
      * @param amount The evaluated amount to send back (e.g., after private PnL execution).
-     * @param proofId Reference to the cryptographic ZKP logged off-chain.
+     * @param proofId Reference to the cryptographic TEE Attestation logged off-chain.
      */
     function unshield(address recipient, address token, uint256 amount, bytes32 proofId) external onlyTEE {
         require(amount > 0, "OpaqueVault: Amount must be greater than zero");

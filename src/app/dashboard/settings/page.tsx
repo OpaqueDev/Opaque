@@ -40,7 +40,7 @@ export default function SettingsPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <div>
                 <label className="mono" style={{ display: "block", fontSize: "10px", color: "#666", marginBottom: "8px", textTransform: "uppercase" }}>Nox Worker Pool Address</label>
-                <input type="text" defaultValue="0xNoxPool00000000000000000000000000000000" disabled style={{ width: "100%", background: "transparent", border: "1px dashed #333", color: "#0000FF", padding: "12px", fontSize: "14px", fontFamily: "'Share Tech Mono', monospace", outline: "none", opacity: 0.8 }} />
+                <input type="text" defaultValue="0x8b301eb5b2bd9f3fb4ec03649cd97813ba5aa198" disabled style={{ width: "100%", background: "transparent", border: "1px dashed #333", color: "#0000FF", padding: "12px", fontSize: "14px", fontFamily: "'Share Tech Mono', monospace", outline: "none", opacity: 0.8 }} />
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "8px" }}>
                  <input type="checkbox" id="strict" defaultChecked style={{ width: "16px", height: "16px", accentColor: "#0000FF" }} />
@@ -66,7 +66,10 @@ export default function SettingsPage() {
           </div>
 
           <div style={{ border: "1px solid #1a1a1a", padding: "24px", background: "#05050a" }}>
-            <h4 className="mono" style={{ fontSize: "11px", color: "#666", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "16px" }}>Session Status</h4>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <h4 className="mono" style={{ fontSize: "11px", color: "#666", textTransform: "uppercase", letterSpacing: "1px" }}>Session Status</h4>
+              <span className="mono" style={{ background: "rgba(255,200,0,0.1)", color: "#facc15", padding: "4px 8px", fontSize: "9px", border: "1px solid rgba(255,200,0,0.3)" }}>SIMULATION MODE</span>
+            </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span className="mono" style={{ fontSize: "12px", color: "#555" }}>Wallet Bind</span>

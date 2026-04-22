@@ -76,20 +76,14 @@ export default function AnalyticsPage() {
 
         <div className="db db-enc">
           <div style={{ fontSize: "10px", color: "#888", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Share Tech Mono',monospace", marginBottom: "10px" }}>Shielded Vault</div>
-          <div className="enc-row">
-            <span className="enc-sym">USDC</span>
-            <span className="enc-val">{enc1}</span>
-            <span className="enc-pnl">+12.4%</span>
+          <div className="enc-row" style={{ display: 'block', padding: '12px 0' }}>
+            <div style={{ fontSize: '13px', color: '#fff', fontFamily: "'Share Tech Mono',monospace", letterSpacing: '1px' }}>USDC · <span style={{ color: '#555' }}>12,345,678</span> · <span style={{ color: '#4ade80' }}>+12.4%</span></div>
           </div>
-          <div className="enc-row">
-            <span className="enc-sym">ETH</span>
-            <span className="enc-val">{enc2}</span>
-            <span className="enc-pnl">+28.7%</span>
+          <div className="enc-row" style={{ display: 'block', padding: '12px 0' }}>
+            <div style={{ fontSize: '13px', color: '#fff', fontFamily: "'Share Tech Mono',monospace", letterSpacing: '1px' }}>ETH · <span style={{ color: '#555' }}>4,210</span> · <span style={{ color: '#4ade80' }}>+28.7%</span></div>
           </div>
-          <div className="enc-row">
-            <span className="enc-sym">ARB</span>
-            <span className="enc-val">{enc3}</span>
-            <span className="enc-pnl">+5.2%</span>
+          <div className="enc-row" style={{ display: 'block', padding: '12px 0' }}>
+            <div style={{ fontSize: '13px', color: '#fff', fontFamily: "'Share Tech Mono',monospace", letterSpacing: '1px' }}>ARB · <span style={{ color: '#555' }}>89,102</span> · <span style={{ color: '#4ade80' }}>+5.2%</span></div>
           </div>
         </div>
 

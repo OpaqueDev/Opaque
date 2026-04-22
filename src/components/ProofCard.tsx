@@ -235,7 +235,7 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
              <div className="mono" style={{ fontSize: "10px", color: "#888", display: "flex", justifyContent: "space-between" }}>
                <span>Proof ID:</span>
-               <span style={{ color: "#ccc" }}>{mode === 'public' ? `0x${proof}` : "████████████████████"}</span>
+               <span style={{ color: "#ccc" }}>{mode === 'public' ? `0x${proof.slice(0, 4).toUpperCase()}...${proof.slice(-4).toUpperCase()}` : "████████████████████"}</span>
              </div>
              <div className="mono" style={{ fontSize: "10px", color: "#888", display: "flex", justifyContent: "space-between" }}>
                <span>Formula:</span>
@@ -243,9 +243,11 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
              </div>
            </div>
 
-           <div className="mono" style={{ fontSize: "10px", color: "#4ade80", borderTop: "1px solid rgba(0,0,255,0.1)", paddingTop: "10px", marginTop: "4px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-             <span>✓ This proof can be independently verified.</span>
-             <button
+           <div className="mono" style={{ fontSize: "10px", color: "#4ade80", borderTop: "1px solid rgba(0,0,255,0.1)", paddingTop: "10px", marginTop: "4px", display: "flex", flexDirection: "column", gap: "10px" }}>
+             <p style={{ color: "#888", fontSize: "9px", lineHeight: 1.4 }}>Proof is generated via deterministic hashing; execution modeled after TEE confidential compute.</p>
+             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+               <span>✓ This proof can be independently verified.</span>
+               <button
                 onClick={handleVerify}
                 disabled={verifyState !== 'idle' || mode === 'private'}
                 style={{
@@ -260,8 +262,9 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
                   transition: "all 0.2s"
                 }}
              >
-               {verifyState === 'idle' ? "VERIFY PROOF" : verifyState === 'verifying' ? "VERIFYING..." : "✔ PROOF VERIFIED"}
+               {verifyState === 'idle' ? "VERIFY PROOF" : verifyState === 'verifying' ? "VERIFYING..." : "✔ Verified on recomputation"}
              </button>
+             </div>
            </div>
         </div>
 

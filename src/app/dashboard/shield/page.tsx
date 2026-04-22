@@ -128,7 +128,7 @@ export default function ShieldPage() {
                   style={{ width: "100%", background: "#0000FF", border: "none", color: "#fff", padding: "16px", fontSize: "16px", outline: "none", appearance: "none", cursor: "pointer", fontFamily: "'Share Tech Mono', monospace" }}
                 >
                   <option value="USDC">USDC</option>
-                  <option value="ETH">ETH</option>
+                  <option value="WBTC">WBTC</option>
                   <option value="ARB">ARB</option>
                 </select>
               </div>

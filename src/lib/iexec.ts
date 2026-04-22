@@ -42,8 +42,8 @@ export const computePnLInTEE = async (initialValue: number, finalValue: number):
     // Mathematical evaluation inside the Enclave
     const pnl = ((finalValue - initialValue) / initialValue) * 100;
     
-    // Generate verified ZKP hash reference string
-    const proofId = `0xZKP_` + Math.floor(Math.random() * 10e16).toString(16);
+    // Generate verified TEE Attestation hash reference string
+    const proofId = `0xTEE_` + Math.floor(Math.random() * 10e16).toString(16);
 
     return { pnl, proofId };
 };

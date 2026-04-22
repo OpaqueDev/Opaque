@@ -5,8 +5,8 @@ const STEPS = [
   { id: 1, label: "Wallet Connected", sub: "EIP-712 auth initiated", icon: "◈" },
   { id: 2, label: "Data Encrypted", sub: "AES-256 via iExec Nox public key", icon: "🔒" },
   { id: 3, label: "Inside TEE Enclave", sub: "Intel SGX isolated execution", icon: "⬡" },
-  { id: 4, label: "Computation Complete", sub: "PnL calculated privately", icon: "✦" },
-  { id: 5, label: "ZKP Proof Issued", sub: "SHA-256 deterministic reference", icon: "✓" },
+  { id: 4, label: "Execution Finished", sub: "Confidential container destroyed automatically", icon: "🗑️" },
+  { id: 5, label: "TEE Attestation Issued", sub: "SHA-256 deterministic reference", icon: "✓" },
 ];
 
 const chars = ["█", "▓", "▒", "░", "◉", "X", "#", "@", "Ø", "ψ", "Σ", "Δ"];

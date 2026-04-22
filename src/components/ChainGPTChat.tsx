@@ -5,8 +5,9 @@ import { Loader2 } from "lucide-react";
 const SUGGESTED = [
   "Is holding ETH in a TEE safer than cold storage?",
   "What are the risks of using Arbitrum for DeFi?",
-  "Explain iExec Nox confidential compute in simple terms",
-  "How does ZKP verify PnL without leaking balance?",
+  "How does ChainGPT evaluate smart contract risks?",
+  "How does TEE Attestation verify PnL without leaking balance?",
+  "Explain Arbitrum Sepolia deployment details.",
 ];
 
 interface Msg { role: "user" | "ai"; text: string; }

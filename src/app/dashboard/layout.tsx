@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { useAccount, useConnect, useDisconnect, useConnectors } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { useState, useEffect } from "react";
 
@@ -10,6 +10,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const { address, isConnected } = useAccount();
   const { connect } = useConnect();
+  const connectors = useConnectors();
   const { disconnect } = useDisconnect();
 
   const [mounted, setMounted] = useState(false);
@@ -56,7 +57,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                {address?.slice(0,6)}...{address?.slice(-4)}
              </button>
            ) : (
-             <button className="btn-primary bc" style={{ width: "100%", padding: "14px", fontSize: "14px" }} onClick={() => connect({ connector: injected() })}>
+             <button className="btn-primary bc" style={{ width: "100%", padding: "14px", fontSize: "14px" }} onClick={() => {
+                const wc = connectors.find(c => c.id === 'walletConnect');
+                try {
+                  connect({ connector: wc || injected() });
+                } catch {
+                  connect({ connector: injected() });
+                }
+             }}>
                CONNECT WALLET
              </button>
            )}
