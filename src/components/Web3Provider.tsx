@@ -1,24 +1,23 @@
 "use client";
 
-import { WagmiProvider, createConfig, http } from "wagmi";
+import "@rainbow-me/rainbowkit/styles.css";
+import { getDefaultConfig, RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
+import { WagmiProvider } from "wagmi";
 import { mainnet, arbitrumSepolia } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
 
-import { injected, walletConnect } from "wagmi/connectors";
+if (!process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID) {
+  console.warn("⚠️ Warning: NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is missing! WalletConnect may fail. Falling back to injected wallet.");
+}
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "3fcc6bba6f1de962d911bb5b5c3dba68";
 
-const config = createConfig({
+const config = getDefaultConfig({
+  appName: "OPAQUE Proof of Alpha",
+  projectId,
   chains: [arbitrumSepolia, mainnet],
-  connectors: [
-    walletConnect({ projectId, showQrModal: true }),
-    injected(),
-  ],
-  transports: {
-    [arbitrumSepolia.id]: http(),
-    [mainnet.id]: http(),
-  },
+  ssr: true,
 });
 
 export function Web3Provider({ children }: { children: ReactNode }) {
@@ -26,7 +25,9 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        {children}
+        <RainbowKitProvider theme={darkTheme({ accentColor: "#0000FF", borderRadius: "none", fontStack: "system" })}>
+          {children}
+        </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );

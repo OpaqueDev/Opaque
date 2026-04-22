@@ -10,6 +10,9 @@
   🔒 OPAQUE — Proof of Alpha Protocol
 </h1>
 
+## 🌐 Live Demo
+**[https://opaque-eight.vercel.app](https://opaque-eight.vercel.app)**
+
 <p align="center">
   <b>The first confidential DeFi intelligence layer on Arbitrum.</b><br/>
   Prove your portfolio performance to anyone — without revealing a single number.
@@ -33,7 +36,7 @@ Built on top of **iExec Nox Trusted Execution Environments (TEE)**, OPAQUE runs 
 |---|---|---|
 | 🔒 **Asset Shielding** | ✅ Live | Deposit ERC-20 tokens into `OpaqueVault.sol` on Arbitrum Sepolia |
 | ⬡ **TEE Confidential Compute** | ✅ Live | iExec Nox enclave simulation with real SDK integration |
-| 🧬 **Deterministic ZKP Proof** | ✅ Live | `sha256(wallet + initial + pnl)` — reproducible, verifiable by anyone |
+| 🧬 **Deterministic Attestation Proof** | ✅ Live | `sha256(wallet + initial + pnl)` — reproducible, verifiable by anyone |
 | 🤖 **ChainGPT AI Risk Audit** | ✅ Live | Real-time portfolio risk scoring via ChainGPT API |
 | 💬 **ChainGPT AI Chat** | ✅ Live | Interactive AI assistant for DeFi risk discourse |
 | 📊 **Live Network Activity Feed** | ✅ Live | Real-time shield/proof event stream |

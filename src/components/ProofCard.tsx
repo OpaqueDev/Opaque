@@ -244,7 +244,7 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
            </div>
 
            <div className="mono" style={{ fontSize: "10px", color: "#4ade80", borderTop: "1px solid rgba(0,0,255,0.1)", paddingTop: "10px", marginTop: "4px", display: "flex", flexDirection: "column", gap: "10px" }}>
-             <p style={{ color: "#888", fontSize: "9px", lineHeight: 1.4 }}>Proof is generated via deterministic hashing; execution modeled after TEE confidential compute.</p>
+             <p style={{ color: "#888", fontSize: "9px", lineHeight: 1.4 }}>Proof is generated via deterministic hashing; execution model aligns with confidential computing (TEE).</p>
              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                <span>✓ This proof can be independently verified.</span>
                <button

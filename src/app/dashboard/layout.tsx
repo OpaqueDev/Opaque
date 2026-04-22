@@ -2,15 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAccount, useConnect, useDisconnect, useConnectors } from "wagmi";
-import { injected } from "wagmi/connectors";
+import { useAccount, useDisconnect } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useState, useEffect } from "react";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { address, isConnected } = useAccount();
-  const { connect } = useConnect();
-  const connectors = useConnectors();
   const { disconnect } = useDisconnect();
 
   const [mounted, setMounted] = useState(false);
@@ -57,16 +55,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                {address?.slice(0,6)}...{address?.slice(-4)}
              </button>
            ) : (
-             <button className="btn-primary bc" style={{ width: "100%", padding: "14px", fontSize: "14px" }} onClick={() => {
-                const wc = connectors.find(c => c.id === 'walletConnect');
-                try {
-                  connect({ connector: wc || injected() });
-                } catch {
-                  connect({ connector: injected() });
-                }
-             }}>
-               CONNECT WALLET
-             </button>
+             <ConnectButton.Custom>
+               {({ openConnectModal }) => (
+                 <button className="btn-primary bc" onClick={openConnectModal} style={{ width: "100%", padding: "14px", fontSize: "14px" }}>
+                   CONNECT WALLET
+                 </button>
+               )}
+             </ConnectButton.Custom>
            )}
            <div style={{ marginTop: "24px", paddingTop: "24px", borderTop: "2px solid #1a1a1a" }}>
              <Link href="/" className="mono" style={{ color: "#666", fontSize: "11px", textDecoration: "none", display: "flex", alignItems: "center", gap: "8px", transition: "color 0.2s" }} onMouseOver={e => e.currentTarget.style.color = '#fff'} onMouseOut={e => e.currentTarget.style.color = '#666'}>

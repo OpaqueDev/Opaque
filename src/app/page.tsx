@@ -353,17 +353,8 @@ export default function Home() {
             <ul className="footer-links">
               <li><a href="https://docs.iex.ec/nox-protocol/" target="_blank" rel="noreferrer">Nox Documentation</a></li>
               <li><a href="https://dorahacks.io/hackathon/vibe-coding-iexec/detail" target="_blank" rel="noreferrer">Hackathon Details</a></li>
-              <li><a href="#">ChainGPT API</a></li>
-              <li><a href="#">GitHub</a></li>
-            </ul>
-          </div>
-          <div>
-            <div className="footer-col-title">Socials</div>
-            <ul className="footer-links">
-              <li><a href="#">X / Twitter</a></li>
-              <li><a href="#">Discord</a></li>
-              <li><a href="#">Telegram</a></li>
-              <li><a href="#">Medium</a></li>
+              <li><a href="https://www.chaingpt.org/api" target="_blank" rel="noreferrer">ChainGPT API</a></li>
+              <li><a href="https://github.com/Dwica2004/opque" target="_blank" rel="noreferrer">GitHub</a></li>
             </ul>
           </div>
         </div>
