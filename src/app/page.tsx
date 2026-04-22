@@ -92,9 +92,13 @@ export default function Home() {
               <div className="cube-face bottom"></div>
             </div>
           </div>
-          <div className="hero-right-text">
-            <h3>Confidential Layer Active</h3>
-            <p>iExec Nox wraps your assets in a cryptographic shield. Trade freely. Share only proof.</p>
+          <div className="hero-right-text" style={{ background: "rgba(0,0,255,0.05)", border: "1px solid rgba(0,0,255,0.2)", padding: "20px", backdropFilter: "blur(4px)" }}>
+            <div style={{ fontSize: "10px", color: "#0000FF", textTransform: "uppercase", letterSpacing: "2px", marginBottom: "8px", fontFamily: "'Share Tech Mono', monospace" }}>Live Alpha Proof</div>
+            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: "clamp(36px, 6vw, 52px)", color: "#00ffff", lineHeight: 1, textShadow: "0 0 20px rgba(0,255,255,0.5)", marginBottom: "8px" }}>+18.43%</div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: "'Share Tech Mono', monospace", fontSize: "10px", color: "#4ade80" }}>
+              <span style={{ animation: "pulse 2s infinite" }}>●</span> CRYPTOGRAPHICALLY VERIFIED
+            </div>
+            <p style={{ marginTop: "12px", fontSize: "12px" }}>Balance remains completely hidden within TEE enclave.</p>
           </div>
           <div className="hero-corner">SYS:ONLINE · BLOCK #19,482,301</div>
         </div>

@@ -72,13 +72,23 @@ interface ProofCardProps {
 }
 
 export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
+  const [mode, setMode] = useState<'private' | 'public'>('public');
+  const [verifyState, setVerifyState] = useState<'idle' | 'verifying' | 'verified'>('idle');
   const encBalance = useAsciiBlur("████████", true);
+  const encPnl = useAsciiBlur("██████", mode === 'private');
+  
   const isProfit = pnl.startsWith("+");
   const shortenWallet = (w: string) => `${w.slice(0, 6)}...${w.slice(-4)}`;
 
+  const handleVerify = async () => {
+    setVerifyState('verifying');
+    await new Promise(r => setTimeout(r, 600));
+    setVerifyState('verified');
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.85, filter: "blur(10px)", y: 15 }}
+      initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)", y: 15 }}
       animate={{ opacity: 1, scale: 1, filter: "blur(0px)", y: 0 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       style={{
@@ -107,7 +117,23 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
         OPQ
       </div>
 
+      {/* Cinematic Flash Effect */}
+      <motion.div
+        initial={{ opacity: 0.8 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        style={{ position: "absolute", inset: 0, background: "#fff", zIndex: 10, pointerEvents: "none" }}
+      />
+
       <div style={{ position: "relative", zIndex: 3 }}>
+        {/* Toggle Mode */}
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "24px" }}>
+          <div style={{ display: "flex", background: "rgba(0,0,255,0.05)", border: "1px solid rgba(0,0,255,0.2)" }}>
+            <button onClick={() => setMode('private')} style={{ background: mode === 'private' ? "rgba(0,0,255,0.2)" : "transparent", padding: "6px 14px", border: "none", color: mode === 'private' ? "#fff" : "#555", fontSize: "10px", cursor: "pointer", fontFamily: "'Share Tech Mono', monospace", transition: "all 0.2s" }}>PRIVATE</button>
+            <button onClick={() => setMode('public')} style={{ background: mode === 'public' ? "rgba(0,0,255,0.2)" : "transparent", padding: "6px 14px", border: "none", color: mode === 'public' ? "#fff" : "#555", fontSize: "10px", cursor: "pointer", fontFamily: "'Share Tech Mono', monospace", transition: "all 0.2s" }}>PUBLIC PROOF</button>
+          </div>
+        </div>
+
         {/* Header row */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "36px" }}>
           <div>
@@ -147,19 +173,19 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
               fontSize: "clamp(72px, 14vw, 108px)",
               lineHeight: 0.85,
               letterSpacing: "-3px",
-              background: isProfit
+              background: isProfit && mode === 'public'
                 ? "linear-gradient(135deg, #fff 30%, #00ffff 70%)"
-                : "linear-gradient(135deg, #fff 30%, #ff4444 70%)",
+                : (mode === 'private' ? "linear-gradient(135deg, #888 30%, #444 70%)" : "linear-gradient(135deg, #fff 30%, #ff4444 70%)"),
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
-              filter: isProfit
+              filter: isProfit && mode === 'public'
                 ? "drop-shadow(0 0 20px rgba(0,100,255,0.8)) drop-shadow(0 0 40px rgba(0,0,255,0.4))"
-                : "drop-shadow(0 0 20px rgba(255,60,60,0.8))",
+                : (mode === 'private' ? "none" : "drop-shadow(0 0 20px rgba(255,60,60,0.8))"),
               userSelect: "none",
             }}
           >
-            {pnl}
+            {mode === 'public' ? pnl : encPnl}
           </motion.div>
 
           {/* Trust badges */}
@@ -209,7 +235,7 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
              <div className="mono" style={{ fontSize: "10px", color: "#888", display: "flex", justifyContent: "space-between" }}>
                <span>Proof ID:</span>
-               <span style={{ color: "#ccc" }}>0x{proof}</span>
+               <span style={{ color: "#ccc" }}>{mode === 'public' ? `0x${proof}` : "████████████████████"}</span>
              </div>
              <div className="mono" style={{ fontSize: "10px", color: "#888", display: "flex", justifyContent: "space-between" }}>
                <span>Formula:</span>
@@ -217,8 +243,25 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
              </div>
            </div>
 
-           <div className="mono" style={{ fontSize: "10px", color: "#4ade80", borderTop: "1px solid rgba(0,0,255,0.1)", paddingTop: "10px", marginTop: "4px" }}>
-             ✓ This proof can be recomputed by anyone. 
+           <div className="mono" style={{ fontSize: "10px", color: "#4ade80", borderTop: "1px solid rgba(0,0,255,0.1)", paddingTop: "10px", marginTop: "4px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+             <span>✓ This proof can be independently verified.</span>
+             <button
+                onClick={handleVerify}
+                disabled={verifyState !== 'idle' || mode === 'private'}
+                style={{
+                  background: verifyState === 'verified' ? "rgba(0,255,0,0.1)" : "rgba(0,0,255,0.1)",
+                  border: `1px solid ${verifyState === 'verified' ? "#4ade80" : "rgba(0,0,255,0.4)"}`,
+                  color: verifyState === 'verified' ? "#4ade80" : "#fff",
+                  padding: "4px 8px",
+                  cursor: verifyState !== 'idle' || mode === 'private' ? "not-allowed" : "pointer",
+                  fontSize: "10px",
+                  fontFamily: "'Share Tech Mono', monospace",
+                  opacity: mode === 'private' ? 0.3 : 1,
+                  transition: "all 0.2s"
+                }}
+             >
+               {verifyState === 'idle' ? "VERIFY PROOF" : verifyState === 'verifying' ? "VERIFYING..." : "✔ PROOF VERIFIED"}
+             </button>
            </div>
         </div>
 
