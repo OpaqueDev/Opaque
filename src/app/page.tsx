@@ -145,13 +145,13 @@ export default function Home() {
                 <div className="orbit-dot" style={{ left: "-6px", top: "50%", transform: "translateY(-50%)", background: "#ccc" }}></div>
               </div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", border: "2px solid #e0e0e0" }}>
-              <div style={{ padding: "16px", borderRight: "2px solid #e0e0e0" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", border: "1px solid #12121e" }}>
+              <div style={{ padding: "16px", borderRight: "1px solid #12121e", background: "#07070f" }}>
                 <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "28px", color: "#0000FF" }}>A+</div>
                 <div style={{ fontSize: "11px", color: "#999", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>Safety Score</div>
               </div>
-              <div style={{ padding: "16px" }}>
-                <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "28px", color: "#080810" }}>0.0s</div>
+              <div style={{ padding: "16px", background: "#07070f" }}>
+                <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "28px", color: "#fff" }}>0.0s</div>
                 <div style={{ fontSize: "11px", color: "#999", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>Latency</div>
               </div>
             </div>
@@ -250,19 +250,19 @@ export default function Home() {
           <div className="section-label">Proven Results</div>
           <h2 className="results-h2">Proven<br/><em>Results</em></h2>
         </div>
-        <div style={{ border: "2px solid #080810" }}>
-          <div className="results-grid" style={{ border: "none", borderBottom: "2px solid #080810" }}>
+        <div style={{ border: "1px solid #12121e" }}>
+          <div className="results-grid" style={{ border: "none", borderBottom: "1px solid #12121e" }}>
             <div className="result-cell">
               <div className="result-n">$12M+</div>
               <div className="result-l">Assets Shielded</div>
               <div className="result-desc">Total value locked in confidential contracts across all active users.</div>
             </div>
-            <div className="result-cell" style={{ borderRight: "2px solid #080810" }}>
+            <div className="result-cell" style={{ borderRight: "1px solid #12121e" }}>
               <div className="result-n">4,800+</div>
               <div className="result-l">Wallets Protected</div>
               <div className="result-desc">DeFi traders who've moved their portfolio into OPAQUE's confidential layer.</div>
             </div>
-            <div className="result-cell" style={{ borderRight: "2px solid #080810" }}>
+            <div className="result-cell" style={{ borderRight: "1px solid #12121e" }}>
               <div className="result-n">99.9%</div>
               <div className="result-l">Uptime</div>
               <div className="result-desc">Zero downtime incidents. Privacy layer stays live even during peak congestion.</div>
@@ -300,13 +300,13 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <div style={{ marginTop: "48px", borderTop: "2px solid #080810", paddingTop: "40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", borderLeft: "2px solid #080810", borderRight: "2px solid #080810", borderBottom: "2px solid #080810" }}>
-          <div style={{ padding: "24px 28px", borderRight: "2px solid #080810" }}>
+        <div style={{ marginTop: "48px", borderTop: "1px solid #12121e", paddingTop: "40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", borderLeft: "1px solid #12121e", borderRight: "1px solid #12121e", borderBottom: "1px solid #12121e" }}>
+          <div style={{ padding: "24px 28px", borderRight: "1px solid #12121e" }}>
             <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: "18px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px" }}>iExec Nox SDK</div>
             <div style={{ fontSize: "13px", color: "#666", lineHeight: 1.7 }}>Nox enables confidential wrapping of any ERC-20 token. Assets are computationally shielded within a Trusted Execution Environment (TEE).</div>
           </div>
           <div style={{ padding: "24px 28px" }}>
-            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: "18px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px" }}>ChainGPT Audit API</div>
+            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: "18px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", color: "#fff" }}>ChainGPT Audit API</div>
             <div style={{ fontSize: "13px", color: "#666", lineHeight: 1.7 }}>Real-time AI scoring of portfolio risk across 50+ smart contract vulnerability vectors, continuously updated on every block.</div>
           </div>
         </div>
