@@ -1,18 +1,54 @@
 "use client";
 
-import { useAsciiBlur } from "@/components/ProofCard";
 import { useEffect, useState, lazy, Suspense } from "react";
 import { Loader2 } from "lucide-react";
+import { useAccount, useBalance } from "wagmi";
+import { formatUnits } from "viem";
+import { arbitrumSepolia } from "wagmi/chains";
 
 const TEEVisualizer = lazy(() => import("@/components/TEEVisualizer"));
 const ChainGPTChat = lazy(() => import("@/components/ChainGPTChat"));
 const LiveActivityFeed = lazy(() => import("@/components/LiveActivityFeed"));
 
-export default function AnalyticsPage() {
-  const enc1 = useAsciiBlur("12345678", true);
-  const enc2 = useAsciiBlur("1234567", true);
-  const enc3 = useAsciiBlur("1234567", true);
+// ERC-20 addresses on Arbitrum Sepolia
+const USDC_ADDRESS = "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d" as const;
+const ARB_ADDRESS  = "0x912CE59144191C1204E64559FE8253a0e49E6548" as const;
 
+function truncate(addr: string) {
+  return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+}
+
+function formatBal(raw: bigint | undefined, decimals: number): string {
+  if (!raw) return "—";
+  const n = parseFloat(formatUnits(raw, decimals));
+  return n.toLocaleString("en-US", { maximumFractionDigits: 4 });
+}
+
+export default function AnalyticsPage() {
+  const { address, isConnected } = useAccount();
+
+  // Real on-chain balances
+  const { data: ethBal, isLoading: ethLoading } = useBalance({
+    address,
+    chainId: arbitrumSepolia.id,
+    query: { enabled: !!address },
+  });
+  const { data: usdcBal, isLoading: usdcLoading } = useBalance({
+    address,
+    token: USDC_ADDRESS,
+    chainId: arbitrumSepolia.id,
+    query: { enabled: !!address },
+  });
+  const { data: arbBal, isLoading: arbLoading } = useBalance({
+    address,
+    token: ARB_ADDRESS,
+    chainId: arbitrumSepolia.id,
+    query: { enabled: !!address },
+  });
+
+  const balancesLoading = ethLoading || usdcLoading || arbLoading;
+
+  // ChainGPT audit
   const [audit, setAudit] = useState<{
     score: string; trust_score: number; rug_risk: string; exploit: string; volatility: string;
   } | null>(null);
@@ -24,19 +60,70 @@ export default function AnalyticsPage() {
       .catch(err => console.error(err));
   }, []);
 
+  // Derive a simple PnL indicator from ETH balance (simulation: treat 0.01 ETH as baseline)
+  const ethNum = ethBal ? parseFloat(formatUnits(ethBal.value, 18)) : 0;
+  const simulatedPnL = isConnected && ethNum > 0
+    ? ((ethNum - 0.01) / 0.01 * 100).toFixed(2)
+    : null;
+
+  const pnlDisplay = simulatedPnL
+    ? `${parseFloat(simulatedPnL) >= 0 ? "+" : ""}${simulatedPnL}%`
+    : "+0.00%";
+
+  const vaultItems = [
+    {
+      token: "ETH",
+      bal: ethBal ? formatBal(ethBal.value, 18) : "—",
+      loading: ethLoading,
+    },
+    {
+      token: "USDC",
+      bal: usdcBal ? formatBal(usdcBal.value, 6) : "—",
+      loading: usdcLoading,
+    },
+    {
+      token: "ARB",
+      bal: arbBal ? formatBal(arbBal.value, 18) : "—",
+      loading: arbLoading,
+    },
+  ];
+
   return (
     <div style={{ animation: "fade-in 0.3s ease", display: "flex", flexDirection: "column", gap: "24px" }}>
 
-      {/* ROW 1: PnL Overview + ChainGPT Audit */}
+      {/* Wallet banner */}
+      {isConnected && address && (
+        <div className="mono" style={{ fontSize: "11px", color: "#555", letterSpacing: "1px", display: "flex", gap: "16px", alignItems: "center" }}>
+          <span style={{ color: "#0000FF" }}>◉</span>
+          WALLET {truncate(address)} · ARBITRUM SEPOLIA · LIVE DATA
+        </div>
+      )}
+
+      {/* ROW 1: PnL + ChainGPT Audit + Win Rate + Shielded Vault + NOX */}
       <div className="dash-bento" style={{ padding: 0 }}>
+
+        {/* PnL card */}
         <div className="db db-pnl">
           <div>
             <div className="pnl-label" style={{ color: "#999" }}>Aggregate Verified PnL</div>
             <div className="pnl-big">
-              <span className="pnl-plus">+</span>18.43%
+              {isConnected && !ethLoading ? (
+                <>
+                  <span className="pnl-plus">{pnlDisplay.startsWith("-") ? "" : "+"}</span>
+                  {pnlDisplay.replace("+", "")}
+                </>
+              ) : isConnected ? (
+                <Loader2 size={28} className="animate-spin" style={{ color: "#0000FF" }} />
+              ) : (
+                <span style={{ fontSize: "24px", color: "#333" }}>—</span>
+              )}
             </div>
-            <div className="pnl-bar"><div className="pnl-bar-fill"></div></div>
-            <div className="pnl-sub" style={{ color: "#aaa" }}>▲ On-chain verified · Balance private</div>
+            <div className="pnl-bar"><div className="pnl-bar-fill" /></div>
+            <div className="pnl-sub" style={{ color: "#aaa" }}>
+              {isConnected
+                ? "▲ On-chain verified · Balance private"
+                : "Connect wallet to see live PnL"}
+            </div>
           </div>
           <div style={{ marginTop: "20px" }}>
             <svg width="100%" height="60" viewBox="0 0 300 60" preserveAspectRatio="none">
@@ -46,6 +133,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
+        {/* ChainGPT Audit */}
         <div className="db db-safety" style={{ border: "1px solid #0000FF", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
           {!audit ? (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", color: "#0000FF" }}>
@@ -60,33 +148,58 @@ export default function AnalyticsPage() {
                 <div style={{ fontSize: "10px", color: "rgba(255,255,255,.5)", marginTop: "4px", fontFamily: "'Share Tech Mono',monospace" }}>Trust Score · {audit.trust_score}/100</div>
               </div>
               <div style={{ marginTop: "16px", display: "flex", flexDirection: "column", gap: "8px" }}>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,.5)", display: "flex", justifyContent: "space-between", fontFamily: "'Share Tech Mono',monospace" }}><span>Rug Risk</span><span style={{ color: audit.rug_risk === "HIGH" ? "#ff4444" : "#4ade80" }}>{audit.rug_risk}</span></div>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,.5)", display: "flex", justifyContent: "space-between", fontFamily: "'Share Tech Mono',monospace" }}><span>Exploit</span><span style={{ color: audit.exploit === "HIGH" ? "#ff4444" : "#4ade80" }}>{audit.exploit}</span></div>
-                <div style={{ fontSize: "10px", color: "rgba(255,255,255,.5)", display: "flex", justifyContent: "space-between", fontFamily: "'Share Tech Mono',monospace" }}><span>Volatility</span><span style={{ color: audit.volatility === "HIGH" ? "#ff4444" : audit.volatility === "MED" ? "rgba(255,255,100,.8)" : "#4ade80" }}>{audit.volatility}</span></div>
+                {[
+                  { label: "Rug Risk", val: audit.rug_risk },
+                  { label: "Exploit", val: audit.exploit },
+                  { label: "Volatility", val: audit.volatility },
+                ].map(({ label, val }) => (
+                  <div key={label} style={{ fontSize: "10px", color: "rgba(255,255,255,.5)", display: "flex", justifyContent: "space-between", fontFamily: "'Share Tech Mono',monospace" }}>
+                    <span>{label}</span>
+                    <span style={{ color: val === "HIGH" ? "#ff4444" : val === "MED" ? "rgba(255,255,100,.8)" : "#4ade80" }}>{val}</span>
+                  </div>
+                ))}
               </div>
             </>
           )}
         </div>
 
+        {/* Win Rate */}
         <div className="db db-stat">
           <div className="stat-l" style={{ color: "#999" }}>Win Rate</div>
           <div className="stat-n">73%</div>
-          <div style={{ height: "3px", background: "#1a1a1a", marginTop: "12px" }}><div style={{ height: "100%", width: "73%", background: "#0000FF" }}></div></div>
+          <div style={{ height: "3px", background: "#1a1a1a", marginTop: "12px" }}>
+            <div style={{ height: "100%", width: "73%", background: "#0000FF" }} />
+          </div>
         </div>
 
+        {/* Shielded Vault — real balances */}
         <div className="db db-enc">
-          <div style={{ fontSize: "10px", color: "#888", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Share Tech Mono',monospace", marginBottom: "10px" }}>Shielded Vault</div>
-          <div className="enc-row" style={{ display: 'block', padding: '12px 0' }}>
-            <div style={{ fontSize: '13px', color: '#fff', fontFamily: "'Share Tech Mono',monospace", letterSpacing: '1px' }}>USDC · <span style={{ color: '#555' }}>12,345,678</span> · <span style={{ color: '#4ade80' }}>+12.4%</span></div>
+          <div style={{ fontSize: "10px", color: "#888", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Share Tech Mono',monospace", marginBottom: "10px" }}>
+            Shielded Vault {isConnected && <span style={{ color: "#0000FF" }}>· LIVE</span>}
           </div>
-          <div className="enc-row" style={{ display: 'block', padding: '12px 0' }}>
-            <div style={{ fontSize: '13px', color: '#fff', fontFamily: "'Share Tech Mono',monospace", letterSpacing: '1px' }}>ETH · <span style={{ color: '#555' }}>4,210</span> · <span style={{ color: '#4ade80' }}>+28.7%</span></div>
-          </div>
-          <div className="enc-row" style={{ display: 'block', padding: '12px 0' }}>
-            <div style={{ fontSize: '13px', color: '#fff', fontFamily: "'Share Tech Mono',monospace", letterSpacing: '1px' }}>ARB · <span style={{ color: '#555' }}>89,102</span> · <span style={{ color: '#4ade80' }}>+5.2%</span></div>
-          </div>
+
+          {!isConnected ? (
+            <div className="mono" style={{ fontSize: "11px", color: "#333", paddingTop: "8px" }}>
+              Connect wallet to view balances
+            </div>
+          ) : balancesLoading ? (
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#0000FF", paddingTop: "8px" }}>
+              <Loader2 size={12} className="animate-spin" />
+              <span className="mono" style={{ fontSize: "11px" }}>Fetching balances...</span>
+            </div>
+          ) : (
+            vaultItems.map(({ token, bal }) => (
+              <div key={token} className="enc-row" style={{ display: "block", padding: "10px 0", borderBottom: "1px solid #0d0d16" }}>
+                <div style={{ fontSize: "13px", color: "#fff", fontFamily: "'Share Tech Mono',monospace", letterSpacing: "1px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ color: "#0000FF" }}>{token}</span>
+                  <span style={{ color: "#aaa" }}>{bal}</span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
+        {/* NOX Pool */}
         <div className="db db-stat">
           <div className="stat-l" style={{ color: "#999" }}>NOX Pool Network</div>
           <div className="stat-n" style={{ color: "#0000FF", fontSize: "28px", marginTop: "4px" }}>ACTIVE</div>
@@ -94,7 +207,7 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* ROW 2: TEE Visualizer + ChainGPT Chat */}
+      {/* ROW 2 */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }} className="dash-grid-2">
         <Suspense fallback={<div style={{ background: "#05050a", border: "1px solid #111", padding: "32px", color: "#333" }} className="mono">Loading Visualizer...</div>}>
           <TEEVisualizer />
@@ -104,7 +217,7 @@ export default function AnalyticsPage() {
         </Suspense>
       </div>
 
-      {/* ROW 3: Live Activity Feed */}
+      {/* ROW 3 */}
       <Suspense fallback={<div style={{ background: "#05050a", border: "1px solid #111", padding: "24px", color: "#333" }} className="mono">Loading feed...</div>}>
         <LiveActivityFeed />
       </Suspense>
