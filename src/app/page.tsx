@@ -29,6 +29,7 @@ export default function Home() {
           <li><a href="#why">Why Us</a></li>
           <li><a href="#services">Services</a></li>
           <li><a href="#tech">Technology</a></li>
+          <li><Link href="/docs" style={{ color: "inherit", textDecoration: "none" }}>Docs</Link></li>
         </ul>
         <Link href="/dashboard" className="nav-cta" style={{ textDecoration: "none" }}>Launch App ↗</Link>
         <button className="hamburger" id="hamburger" aria-label="Menu" onClick={() => setNavOpen(!navOpen)}>
@@ -42,6 +43,7 @@ export default function Home() {
         <a href="#why" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "#fff", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Why Us</a>
         <a href="#services" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "#fff", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Services</a>
         <a href="#tech" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "#fff", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Technology</a>
+        <Link href="/docs" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "#0000FF", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Docs</Link>
       </div>
 
       <section className="hero">
