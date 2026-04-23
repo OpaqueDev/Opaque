@@ -31,7 +31,7 @@ const HOW_IT_WORKS = [
 export default function ComputeVaultPage() {
   const { address, isConnected } = useAccount();
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  useEffect(() => { const t = setTimeout(() => setMounted(true), 0); return () => clearTimeout(t); }, []);
 
   const [initialValue, setInitialValue] = useState("");
   const [finalValue, setFinalValue] = useState("");

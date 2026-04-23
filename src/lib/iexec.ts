@@ -13,7 +13,7 @@ let iexecInstance: typeof IExec | null = null;
 export const initializeIExec = () => {
     try {
         if (typeof window !== "undefined") {
-            // @ts-ignore - Intentionally bypassed for demo injection 
+            // @ts-expect-error - Intentionally bypassed for demo injection 
             iexecInstance = new IExec({ ethProvider: window.ethereum });
         }
     } catch (error) {

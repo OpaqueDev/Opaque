@@ -203,7 +203,7 @@ export default function Home() {
               <svg className="service-icon-svg" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
             </div>
             <div className="service-title">Asset Shielding</div>
-            <div className="service-body">Wrap any ERC-20 token into iExec Nox's confidential container with one click. Unwrap anytime — 0.05% fee only on exit.</div>
+            <div className="service-body">Wrap any ERC-20 token into iExec Nox&apos;s confidential container with one click. Unwrap anytime — 0.05% fee only on exit.</div>
             <Link className="service-link" href="/dashboard/shield">Get Started →</Link>
           </div>
           <div className="service-card">
@@ -264,7 +264,7 @@ export default function Home() {
             <div className="result-cell" style={{ borderRight: "1px solid #12121e" }}>
               <div className="result-n">4,800+</div>
               <div className="result-l">Wallets Protected</div>
-              <div className="result-desc">DeFi traders who've moved their portfolio into OPAQUE's confidential layer.</div>
+              <div className="result-desc">DeFi traders who&apos;ve moved their portfolio into OPAQUE&apos;s confidential layer.</div>
             </div>
             <div className="result-cell" style={{ borderRight: "1px solid #12121e" }}>
               <div className="result-n">99.9%</div>
@@ -286,7 +286,7 @@ export default function Home() {
             <div className="case-card inv">
               <div className="case-tag">Use Case · Traffic Arbitrage</div>
               <div className="case-title">Traffic Arbitrage &amp; On-Chain Proof</div>
-              <div className="case-body">Performance marketers running on-chain campaigns use OPAQUE's verified cards as cryptographic proof of ROI — no screenshots, no manipulation.</div>
+              <div className="case-body">Performance marketers running on-chain campaigns use OPAQUE&apos;s verified cards as cryptographic proof of ROI — no screenshots, no manipulation.</div>
             </div>
           </div>
         </div>
@@ -295,7 +295,7 @@ export default function Home() {
       <section className="tech" id="tech">
         <div className="section-label">Technology Stack</div>
         <h2 className="tech-h2">We Employ<br/>The Most<br/>Advanced<br/>Technologies</h2>
-        <p className="tech-sub">Built on battle-tested infrastructure — from iExec's confidential computing network to ChainGPT's AI audit engine. Every component chosen for security and performance.</p>
+        <p className="tech-sub">Built on battle-tested infrastructure — from iExec&apos;s confidential computing network to ChainGPT&apos;s AI audit engine. Every component chosen for security and performance.</p>
         <div className="tech-circles">
           {['iExec Nox', 'ChainGPT', 'Arbitrum', 'Next.js', 'RLC Token', 'Wagmi', 'Viem', 'USDC'].map(t => (
             <div className="tech-circle" key={t}>
