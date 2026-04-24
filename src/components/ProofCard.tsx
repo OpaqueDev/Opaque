@@ -69,13 +69,14 @@ interface ProofCardProps {
   proof: string;
   wallet: string;
   onDownload?: () => void;
+  isCapturing?: boolean;
 }
 
-export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
+export function ProofCard({ pnl, proof, wallet, onDownload, isCapturing = false }: ProofCardProps) {
   const [mode, setMode] = useState<'private' | 'public'>('public');
   const [verifyState, setVerifyState] = useState<'idle' | 'verifying' | 'verified'>('idle');
   const encBalance = useAsciiBlur("████████", true);
-  const encPnl = useAsciiBlur("██████", mode === 'private');
+  const encPnl = useAsciiBlur("██████", mode === 'private' && !isCapturing);
   
   const isProfit = pnl.startsWith("+");
   const shortenWallet = (w: string) => `${w.slice(0, 6)}...${w.slice(-4)}`;
@@ -152,7 +153,7 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
         </div>
 
         {/* PnL HERO — The BOOM element */}
-        <div style={{ marginBottom: "32px", position: "relative" }}>
+        <div style={{ marginBottom: "32px", position: "relative", minHeight: isCapturing && mode === 'private' ? "160px" : undefined }}>
           {/* Burst animation behind PnL */}
           <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
@@ -169,7 +170,13 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.5 }}
             className="bc"
-            style={{
+            style={isCapturing ? {
+              fontSize: "clamp(72px, 14vw, 108px)",
+              lineHeight: 0.85,
+              letterSpacing: "-3px",
+              color: mode === 'private' ? "transparent" : (isProfit ? "#00ccff" : "#ff4444"),
+              userSelect: "none",
+            } : {
               fontSize: "clamp(72px, 14vw, 108px)",
               lineHeight: 0.85,
               letterSpacing: "-3px",
@@ -187,6 +194,29 @@ export function ProofCard({ pnl, proof, wallet, onDownload }: ProofCardProps) {
           >
             {mode === 'public' ? pnl : encPnl}
           </motion.div>
+
+          {/* Private capture overlay — replaces scramble with clean confidential badge */}
+          {isCapturing && mode === 'private' && (
+            <div style={{
+              position: "absolute", inset: 0,
+              background: "rgba(4,4,13,0.92)",
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+              gap: "10px", border: "1px solid rgba(0,0,255,0.3)",
+            }}>
+              <div style={{ fontSize: "11px", color: "rgba(0,0,255,0.6)", letterSpacing: "6px", fontFamily: "'Share Tech Mono', monospace", textTransform: "uppercase" }}>
+                ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+              </div>
+              <div className="bc" style={{ fontSize: "28px", color: "#0000FF", letterSpacing: "8px", textTransform: "uppercase" }}>
+                CONFIDENTIAL
+              </div>
+              <div style={{ fontSize: "9px", color: "rgba(0,0,255,0.4)", letterSpacing: "4px", fontFamily: "'Share Tech Mono', monospace" }}>
+                SHIELDED BY IEXEC NOX TEE
+              </div>
+              <div style={{ fontSize: "11px", color: "rgba(0,0,255,0.6)", letterSpacing: "6px", fontFamily: "'Share Tech Mono', monospace", textTransform: "uppercase" }}>
+                ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+              </div>
+            </div>
+          )}
 
           {/* Trust badges */}
           <motion.div

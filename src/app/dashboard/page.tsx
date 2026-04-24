@@ -39,6 +39,7 @@ export default function ComputeVaultPage() {
   const [loadingStep, setLoadingStep] = useState(0);
   const [result, setResult] = useState<{ pnl: string; proof: string } | null>(null);
   const [shareMode, setShareMode] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const handleCompute = async () => {
@@ -64,8 +65,11 @@ export default function ComputeVaultPage() {
 
   const handleDownload = async () => {
     if (!cardRef.current) return;
+    setIsCapturing(true);
+    await new Promise(r => setTimeout(r, 80)); // wait for re-render with static styles
     const { default: html2canvas } = await import("html2canvas");
     const canvas = await html2canvas(cardRef.current, { backgroundColor: "#04040d", scale: 2, useCORS: true });
+    setIsCapturing(false);
     const a = document.createElement("a");
     a.download = `opaque-alpha-proof-${Date.now()}.png`;
     a.href = canvas.toDataURL("image/png");
@@ -86,7 +90,7 @@ export default function ComputeVaultPage() {
           </div>
 
           <div ref={cardRef}>
-            <ProofCard pnl={result.pnl} proof={result.proof} wallet={address!} />
+            <ProofCard pnl={result.pnl} proof={result.proof} wallet={address!} isCapturing={isCapturing} />
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "20px" }}>
@@ -282,12 +286,15 @@ export default function ComputeVaultPage() {
               </motion.div>
             ) : (
               <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ width: "100%", padding: "24px" }}>
-                <ProofCard
-                  pnl={result.pnl}
-                  proof={result.proof}
-                  wallet={address!}
-                  onDownload={handleDownload}
-                />
+                <div ref={cardRef}>
+                  <ProofCard
+                    pnl={result.pnl}
+                    proof={result.proof}
+                    wallet={address!}
+                    onDownload={handleDownload}
+                    isCapturing={isCapturing}
+                  />
+                </div>
                 <motion.button
                   whileHover={{ scale: 1.01, boxShadow: "0 0 20px rgba(0,0,255,0.2)" }}
                   whileTap={{ scale: 0.99 }}
@@ -295,7 +302,7 @@ export default function ComputeVaultPage() {
                   onClick={() => setShareMode(true)}
                   style={{ width: "100%", marginTop: "16px", padding: "16px", background: "var(--foreground)", color: "var(--bg-deep)", border: "none", fontSize: "17px", cursor: "pointer", letterSpacing: "1px", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px" }}
                 >
-                  📤 OPEN SHARE MODE ↗
+                  {"📤 OPEN SHARE MODE ↗︎"}
                 </motion.button>
               </motion.div>
             )}
