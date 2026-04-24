@@ -3,7 +3,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,800;0,900;1,800&family=Inter:wght@400;500;600&family=Share+Tech+Mono&display=swap');
 
 @keyframes spin {
   from { transform: rotate(0deg); }
@@ -68,9 +67,10 @@ select option {
   color: var(--foreground);
   padding: 12px;
 }
-body{background:var(--bg-deep);color:var(--foreground);font-family:'Inter',sans-serif;overflow-x:hidden}
-.bc{font-family:'Barlow Condensed',sans-serif}
-.mono{font-family:'Share Tech Mono',monospace}
+body{background:var(--bg-deep);color:var(--foreground);font-family:var(--font-inter),'Inter',sans-serif;overflow-x:hidden}
+html{overflow-x:hidden}
+.bc{font-family:var(--font-barlow),'Barlow Condensed',sans-serif}
+.mono{font-family:var(--font-mono),'Share Tech Mono',monospace}
 
 /* ── Premium scrollbar ───────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
