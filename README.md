@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://opaque-eight.vercel.app"><strong>Live Demo - opaque-eight.vercel.app</strong></a>
+  <a href="https://www.opaque.site/"><strong>Live Demo - www.opaque.site</strong></a>
   &nbsp;
   <a href="https://github.com/Dwica2004/opque">GitHub</a>
   &nbsp;
@@ -539,6 +539,6 @@ MIT © 2026 OPAQUE Protocol Team
 
 <p align="center">
   <b>OPAQUE Protocol - Proof of Alpha</b><br/>
-  Built for the <a href="https://dorahacks.io">iExec × ChainGPT Vibe Coding Hackathon</a> &nbsp; Dorahacks &nbsp; April 2026<br/><br/>
+  Built for the <a href="https://dorahacks.io">iExec × ChainGPT Vibe Coding Hackathon</a><br/><br/>
   <i>"Prove your profit. Hide your balance."</i>
 </p>
