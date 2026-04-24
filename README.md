@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="public/banner.png" width="100%" />
+  <img src="public/banner.svg" width="100%" />
 </p>
 
-<h1 align="center">OPAQUE — Proof of Alpha Protocol</h1>
+<h1 align="center">OPAQUE - Proof of Alpha Protocol</h1>
 
 <p align="center">
   <b>Prove your profit. Hide your balance.</b><br/>
@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://opaque-eight.vercel.app"><strong>Live Demo — opaque-eight.vercel.app</strong></a>
+  <a href="https://opaque-eight.vercel.app"><strong>Live Demo - opaque-eight.vercel.app</strong></a>
   &nbsp;
   <a href="https://github.com/Dwica2004/opque">GitHub</a>
   &nbsp;
@@ -38,11 +38,11 @@
 
 ## What is OPAQUE?
 
-OPAQUE is a **Proof of Alpha Protocol** — a full-stack Web3 dApp that lets DeFi traders cryptographically prove their portfolio performance to **anyone**, without revealing their actual balance, wallet, or holdings.
+OPAQUE is a **Proof of Alpha Protocol** - a full-stack Web3 dApp that lets DeFi traders cryptographically prove their portfolio performance to **anyone**, without revealing their actual balance, wallet, or holdings.
 
 > _"Zero-knowledge for the everyday DeFi trader. Not a gimmick. A protocol."_
 
-Built on **iExec Nox Trusted Execution Environments (TEE)**, portfolio computations run inside Intel SGX hardware enclaves — completely sealed from the node operator, the network, and even the OPAQUE team. The output is a **deterministic SHA-256 Alpha Proof** — verifiable by anyone, reversible by no one.
+Built on **iExec Nox Trusted Execution Environments (TEE)**, portfolio computations run inside Intel SGX hardware enclaves - completely sealed from the node operator, the network, and even the OPAQUE team. The output is a **deterministic SHA-256 Alpha Proof** - verifiable by anyone, reversible by no one.
 
 ## The Problem
 
@@ -64,7 +64,7 @@ In DeFi, every on-chain action is public. A great trader **cannot prove their al
 | ZK-SNARKs (Aztec, etc.) | Complex, no PnL semantics |
 | Tornado Cash | No attestation, regulatory risk |
 
-**OPAQUE solves this**: prove `+143% PnL in 90 days` — with a hash anyone can verify — but zero information about your balance leaks.
+**OPAQUE solves this**: prove `+143% PnL in 90 days` - with a hash anyone can verify - but zero information about your balance leaks.
 
 ## How It Works
 
@@ -72,7 +72,7 @@ In DeFi, every on-chain action is public. A great trader **cannot prove their al
 1. SHIELD      Deposit ERC-20 tokens into OpaqueVault.sol (on-chain)
 2. COMPUTE     iExec Nox enclave calculates net yield (off-chain, sealed)
 3. ATTEST      SHA-256 Alpha Proof is generated: sha256(wallet + initial + pnl)
-4. SHARE       Proof is distributed — Twitter, Discord, DAOs, anywhere
+4. SHARE       Proof is distributed - Twitter, Discord, DAOs, anywhere
 5. VERIFY      Anyone recomputes sha256(wallet + initial + pnl) and checks match
 ```
 
@@ -85,7 +85,7 @@ In DeFi, every on-chain action is public. A great trader **cannot prove their al
 |---------|--------|-------------|
 | **Asset Shielding** | Live | Deposit ERC-20s into `OpaqueVault.sol` on Arbitrum Sepolia |
 | **TEE Confidential Compute** | Live | iExec Nox SGX enclave integration with real SDK |
-| **Alpha Proof (SHA-256)** | Live | `sha256(wallet + initial + pnl)` — deterministic, verifiable |
+| **Alpha Proof (SHA-256)** | Live | `sha256(wallet + initial + pnl)` - deterministic, verifiable |
 | **Proof Verification** | Live | Anyone can independently recompute and verify the proof |
 | **ChainGPT AI Risk Audit** | Live | Real-time portfolio risk scoring via ChainGPT API |
 | **ChainGPT AI Chat** | Live | Interactive DeFi risk assistant powered by ChainGPT |
@@ -141,7 +141,7 @@ User Input (wallet, initial_value, final_value)
 
 ## Smart Contract
 
-**`OpaqueVault.sol`** — Deployed on Arbitrum Sepolia
+**`OpaqueVault.sol`** - Deployed on Arbitrum Sepolia
 
 ```
 Contract Address: 0xD4Ca145CB0340399be832a83E42da44bAE6E77aF
@@ -152,14 +152,14 @@ Explorer:         https://sepolia.arbiscan.io/address/0xD4Ca145CB0340399be832a83
 ### ABI Summary
 
 ```solidity
-// Shield assets — permissionless, anyone can deposit
+// Shield assets - permissionless, anyone can deposit
 function shield(
     address token,           // ERC-20 token address
     uint256 amount,          // Token amount (in wei)
     bytes calldata payload   // Encrypted routing payload for iExec Worker
 ) external;
 
-// Unshield assets — only callable by TEE Oracle (iExec Worker Pool)
+// Unshield assets - only callable by TEE Oracle (iExec Worker Pool)
 function unshield(
     address recipient,       // Destination wallet
     address token,           // ERC-20 token address
@@ -176,7 +176,7 @@ event AssetUnshielded(address indexed recipient, address indexed token, uint256 
 
 | Decision | Rationale |
 |----------|-----------|
-| `shield()` is permissionless | Anyone can deposit — no whitelist risk |
+| `shield()` is permissionless | Anyone can deposit - no whitelist risk |
 | `unshield()` is `onlyTEE` | Only verified SGX enclave can authorize withdrawals |
 | `encryptedPayload` in `shield()` | Hides routing intent from mempool observers |
 | `setTEEOracle()` available | Multisig can rotate oracle without vault redeployment |
@@ -198,10 +198,10 @@ const proof = crypto
 ```
 
 **Properties:**
-- **Deterministic** — Same inputs always produce same hash
-- **Reproducible** — Any third party can verify with public inputs
-- **One-way** — Cannot derive balance from proof ID alone
-- **Unique** — Collision probability: 1 in 2^256
+- **Deterministic** - Same inputs always produce same hash
+- **Reproducible** - Any third party can verify with public inputs
+- **One-way** - Cannot derive balance from proof ID alone
+- **Unique** - Collision probability: 1 in 2^256
 
 ### Verification Process
 
@@ -230,7 +230,7 @@ The Alpha Proof reveals **only what the prover chooses to disclose**. Typically:
 
 ### What is iExec Nox?
 
-iExec Nox is a confidential computing platform that executes code inside **Intel SGX hardware enclaves** — sealed CPU environments where:
+iExec Nox is a confidential computing platform that executes code inside **Intel SGX hardware enclaves** - sealed CPU environments where:
 
 - Memory is encrypted at the hardware level
 - Not even the node operator can see computation state
@@ -354,7 +354,7 @@ Create `.env.local` in the root directory:
 # Get yours at: https://app.chaingpt.org/apidashboard
 CHAINGPT_API_KEY="your-chaingpt-api-key"
 
-# OpaqueVault contract address (Arbitrum Sepolia — already deployed)
+# OpaqueVault contract address (Arbitrum Sepolia - already deployed)
 NEXT_PUBLIC_VAULT_ADDRESS="0xD4Ca145CB0340399be832a83E42da44bAE6E77aF"
 
 # WalletConnect Project ID (required for QR code wallet connection)
@@ -431,7 +431,7 @@ Generate an Alpha Proof from portfolio data.
 
 ### `POST /api/chaingpt`
 
-**Chat Mode** — Ask ChainGPT a DeFi question:
+**Chat Mode** - Ask ChainGPT a DeFi question:
 
 **Request:**
 ```json
@@ -443,7 +443,7 @@ Generate an Alpha Proof from portfolio data.
 { "answer": "TEE provides hardware-level isolation which..." }
 ```
 
-**Audit Mode** — Get portfolio risk score (no body needed):
+**Audit Mode** - Get portfolio risk score (no body needed):
 
 **Request:**
 ```json
@@ -499,7 +499,7 @@ Q4 2026  v1.0
 |--------|-----------|
 | API key exposure | Stored server-side only (`.env.local` / Vercel secrets) |
 | Vault drain attack | `unshield()` gated to `teeOracle` only |
-| Fake proof claim | SHA-256 is publicly reproducible — forgery is instantly detectable |
+| Fake proof claim | SHA-256 is publicly reproducible - forgery is instantly detectable |
 | MEV / front-running | `encryptedPayload` masks shield intent from mempool |
 | Oracle compromise | `setTEEOracle()` is `onlyOwner` (multisig in production) |
 
@@ -538,7 +538,7 @@ git push origin feature/your-feature-name
 MIT © 2026 OPAQUE Protocol Team
 
 <p align="center">
-  <b>OPAQUE Protocol — Proof of Alpha</b><br/>
+  <b>OPAQUE Protocol - Proof of Alpha</b><br/>
   Built for the <a href="https://dorahacks.io">iExec × ChainGPT Vibe Coding Hackathon</a> &nbsp; Dorahacks &nbsp; April 2026<br/><br/>
   <i>"Prove your profit. Hide your balance."</i>
 </p>
