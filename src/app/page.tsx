@@ -31,7 +31,7 @@ export default function Home() {
         </ul>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <ThemeToggle />
-          <Link href="/dashboard" className="nav-cta" style={{ textDecoration: "none" }}>Launch App ↗</Link>
+          <Link href="/dashboard" className="nav-cta" style={{ textDecoration: "none" }}>{"Launch App ↗︎"}</Link>
         </div>
         <button className="hamburger" id="hamburger" aria-label="Menu" onClick={() => setNavOpen(!navOpen)}>
           <span></span><span></span><span></span>
@@ -58,7 +58,7 @@ export default function Home() {
             <p className="hero-sub" style={{ marginBottom: "24px" }}>The first DeFi protocol where you can share verified trading performance — without leaking a single number from your portfolio.</p>
 
             <div className="hero-actions">
-              <Link href="/dashboard" className="btn-primary" style={{ textDecoration: "none" }}>Enter App ↗</Link>
+              <Link href="/dashboard" className="btn-primary" style={{ textDecoration: "none" }}>{"Enter App ↗︎"}</Link>
               <a href="#mission" className="btn-outline" style={{ textDecoration: "none" }}>Learn More</a>
             </div>
           </div>
@@ -342,7 +342,7 @@ export default function Home() {
           <div className="cta-tag">Confidential Layer</div>
           <h2 className="cta-h2">Shield Your<br/>Assets To<br/>Get Access</h2>
           <div style={{ marginTop: "24px" }}>
-            <Link href="/dashboard" className="cta-btn" style={{ textDecoration: "none", padding: "20px 48px", fontSize: "20px" }}>ENTER NOX VAULT ↗</Link>
+            <Link href="/dashboard" className="cta-btn" style={{ textDecoration: "none", padding: "20px 48px", fontSize: "20px" }}>{"ENTER NOX VAULT ↗︎"}</Link>
           </div>
           <p className="cta-note" style={{ marginTop: "24px" }}>Connect wallet on next step. Arbitrum Sepolia testnet only.</p>
         </div>
