@@ -51,14 +51,14 @@ export default function ChainGPTChat() {
   };
 
   return (
-    <div style={{ background: "#05050a", border: "1px solid #1a1a2e", display: "flex", flexDirection: "column", height: "500px" }}>
+    <div style={{ background: "var(--sidebar-bg)", border: "1px solid var(--border-strong)", display: "flex", flexDirection: "column", height: "500px" }}>
       {/* Header */}
-      <div style={{ padding: "14px 20px", borderBottom: "1px solid #111", display: "flex", alignItems: "center", gap: "10px" }}>
+      <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", gap: "10px" }}>
         <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#0000FF", animation: "pulse 2s infinite" }} />
-        <div className="bc" style={{ fontSize: "15px", color: "#fff", textTransform: "uppercase", letterSpacing: "1px" }}>ChainGPT Risk AI</div>
+        <div className="bc" style={{ fontSize: "15px", color: "var(--foreground)", textTransform: "uppercase", letterSpacing: "1px" }}>ChainGPT Risk AI</div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "8px" }}>
           {msgCount > 0 && (
-            <div className="mono" style={{ fontSize: "9px", color: "#888" }}>
+            <div className="mono" style={{ fontSize: "9px", color: "var(--text-dim)" }}>
               {msgCount} msg{msgCount !== 1 ? "s" : ""} sent
             </div>
           )}
@@ -71,7 +71,7 @@ export default function ChainGPTChat() {
         {msgs.map((m, i) => (
           <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
             {m.role === "ai" && (
-              <div className="mono" style={{ width: "22px", height: "22px", borderRadius: "50%", background: "#0000FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", marginRight: "8px", flexShrink: 0, marginTop: "2px" }}>
+              <div className="mono" style={{ width: "22px", height: "22px", borderRadius: "50%", background: "#0000FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", marginRight: "8px", flexShrink: 0, marginTop: "2px", color: "#fff" }}>
                 AI
               </div>
             )}
@@ -81,9 +81,9 @@ export default function ChainGPTChat() {
                 maxWidth: "78%",
                 padding: "10px 14px",
                 fontSize: "12px",
-                background: m.role === "user" ? "#0000FF" : "#0a0a14",
-                border: m.role === "ai" ? "1px solid #1a1a1a" : "none",
-                color: "#fff",
+                background: m.role === "user" ? "#0000FF" : "var(--surface-alt)",
+                border: m.role === "ai" ? "1px solid var(--border)" : "none",
+                color: m.role === "user" ? "#fff" : "var(--foreground)",
                 lineHeight: 1.6,
                 whiteSpace: "pre-wrap",
               }}
@@ -94,7 +94,7 @@ export default function ChainGPTChat() {
         ))}
         {loading && (
           <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#0000FF" }}>
-            <div className="mono" style={{ width: "22px", height: "22px", borderRadius: "50%", background: "#0000FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", marginRight: "0" }}>
+            <div className="mono" style={{ width: "22px", height: "22px", borderRadius: "50%", background: "#0000FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", marginRight: "0", color: "#fff" }}>
               AI
             </div>
             <Loader2 size={12} className="animate-spin" style={{ marginLeft: "8px" }} />
@@ -116,21 +116,21 @@ export default function ChainGPTChat() {
       )}
 
       {/* Input */}
-      <div style={{ padding: "12px 16px", borderTop: "1px solid #111", display: "flex", gap: "8px" }}>
+      <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border)", display: "flex", gap: "8px" }}>
         <input
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === "Enter" && send()}
           placeholder="Ask about DeFi risk, TEE, or portfolio..."
           className="mono"
-          style={{ flex: 1, background: "#0a0a14", border: "1px solid #222", color: "#fff", padding: "10px 12px", fontSize: "12px", outline: "none" }}
+          style={{ flex: 1, background: "var(--surface-alt)", border: "1px solid var(--border-soft)", color: "var(--foreground)", padding: "10px 12px", fontSize: "12px", outline: "none" }}
           maxLength={300}
         />
         <button
           onClick={() => send()}
           disabled={loading || !input.trim()}
           className="mono"
-          style={{ background: !input.trim() || loading ? "#1a1a1a" : "#0000FF", color: "#fff", border: "none", padding: "10px 16px", fontSize: "11px", cursor: !input.trim() || loading ? "not-allowed" : "pointer", transition: "background 0.2s" }}
+          style={{ background: !input.trim() || loading ? "var(--border)" : "#0000FF", color: "#fff", border: "none", padding: "10px 16px", fontSize: "11px", cursor: !input.trim() || loading ? "not-allowed" : "pointer", transition: "background 0.2s" }}
         >
           SEND
         </button>

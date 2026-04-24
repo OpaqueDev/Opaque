@@ -27,7 +27,6 @@ function formatBal(raw: bigint | undefined, decimals: number): string {
 export default function AnalyticsPage() {
   const { address, isConnected } = useAccount();
 
-  // Real on-chain balances
   const { data: ethBal, isLoading: ethLoading } = useBalance({
     address,
     chainId: arbitrumSepolia.id,
@@ -48,7 +47,6 @@ export default function AnalyticsPage() {
 
   const balancesLoading = ethLoading || usdcLoading || arbLoading;
 
-  // ChainGPT audit
   const [audit, setAudit] = useState<{
     score: string; trust_score: number; rug_risk: string; exploit: string; volatility: string;
   } | null>(null);
@@ -60,7 +58,6 @@ export default function AnalyticsPage() {
       .catch(err => console.error(err));
   }, []);
 
-  // Derive a simple PnL indicator from ETH balance (simulation: treat 0.01 ETH as baseline)
   const ethNum = ethBal ? parseFloat(formatUnits(ethBal.value, 18)) : 0;
   const simulatedPnL = isConnected && ethNum > 0
     ? ((ethNum - 0.01) / 0.01 * 100).toFixed(2)
@@ -71,21 +68,9 @@ export default function AnalyticsPage() {
     : "+0.00%";
 
   const vaultItems = [
-    {
-      token: "ETH",
-      bal: ethBal ? formatBal(ethBal.value, 18) : "—",
-      loading: ethLoading,
-    },
-    {
-      token: "USDC",
-      bal: usdcBal ? formatBal(usdcBal.value, 6) : "—",
-      loading: usdcLoading,
-    },
-    {
-      token: "ARB",
-      bal: arbBal ? formatBal(arbBal.value, 18) : "—",
-      loading: arbLoading,
-    },
+    { token: "ETH", bal: ethBal ? formatBal(ethBal.value, 18) : "—", loading: ethLoading },
+    { token: "USDC", bal: usdcBal ? formatBal(usdcBal.value, 6) : "—", loading: usdcLoading },
+    { token: "ARB", bal: arbBal ? formatBal(arbBal.value, 18) : "—", loading: arbLoading },
   ];
 
   return (
@@ -93,7 +78,7 @@ export default function AnalyticsPage() {
 
       {/* Wallet banner */}
       {isConnected && address && (
-        <div className="mono" style={{ fontSize: "11px", color: "#555", letterSpacing: "1px", display: "flex", gap: "16px", alignItems: "center" }}>
+        <div className="mono" style={{ fontSize: "11px", color: "var(--text-muted)", letterSpacing: "1px", display: "flex", gap: "16px", alignItems: "center" }}>
           <span style={{ color: "#0000FF" }}>◉</span>
           WALLET {truncate(address)} · ARBITRUM SEPOLIA · LIVE DATA
         </div>
@@ -105,7 +90,7 @@ export default function AnalyticsPage() {
         {/* PnL card */}
         <div className="db db-pnl">
           <div>
-            <div className="pnl-label" style={{ color: "#999" }}>Aggregate Verified PnL</div>
+            <div className="pnl-label">Aggregate Verified PnL</div>
             <div className="pnl-big">
               {isConnected && !ethLoading ? (
                 <>
@@ -115,11 +100,11 @@ export default function AnalyticsPage() {
               ) : isConnected ? (
                 <Loader2 size={28} className="animate-spin" style={{ color: "#0000FF" }} />
               ) : (
-                <span style={{ fontSize: "24px", color: "#333" }}>—</span>
+                <span style={{ fontSize: "24px", color: "var(--border-soft)" }}>—</span>
               )}
             </div>
             <div className="pnl-bar"><div className="pnl-bar-fill" /></div>
-            <div className="pnl-sub" style={{ color: "#aaa" }}>
+            <div className="pnl-sub">
               {isConnected
                 ? "▲ On-chain verified · Balance private"
                 : "Connect wallet to see live PnL"}
@@ -165,21 +150,21 @@ export default function AnalyticsPage() {
 
         {/* Win Rate */}
         <div className="db db-stat">
-          <div className="stat-l" style={{ color: "#999" }}>Win Rate</div>
+          <div className="stat-l">Win Rate</div>
           <div className="stat-n">73%</div>
-          <div style={{ height: "3px", background: "#1a1a1a", marginTop: "12px" }}>
+          <div style={{ height: "3px", background: "var(--border)", marginTop: "12px" }}>
             <div style={{ height: "100%", width: "73%", background: "#0000FF" }} />
           </div>
         </div>
 
         {/* Shielded Vault — real balances */}
         <div className="db db-enc">
-          <div style={{ fontSize: "10px", color: "#888", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Share Tech Mono',monospace", marginBottom: "10px" }}>
+          <div style={{ fontSize: "10px", color: "var(--text-dim)", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Share Tech Mono',monospace", marginBottom: "10px" }}>
             Shielded Vault {isConnected && <span style={{ color: "#0000FF" }}>· LIVE</span>}
           </div>
 
           {!isConnected ? (
-            <div className="mono" style={{ fontSize: "11px", color: "#333", paddingTop: "8px" }}>
+            <div className="mono" style={{ fontSize: "11px", color: "var(--border-soft)", paddingTop: "8px" }}>
               Connect wallet to view balances
             </div>
           ) : balancesLoading ? (
@@ -189,10 +174,10 @@ export default function AnalyticsPage() {
             </div>
           ) : (
             vaultItems.map(({ token, bal }) => (
-              <div key={token} className="enc-row" style={{ display: "block", padding: "10px 0", borderBottom: "1px solid #0d0d16" }}>
-                <div style={{ fontSize: "13px", color: "#fff", fontFamily: "'Share Tech Mono',monospace", letterSpacing: "1px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div key={token} className="enc-row" style={{ display: "block", padding: "10px 0", borderBottom: "1px solid var(--border)" }}>
+                <div style={{ fontSize: "13px", color: "var(--foreground)", fontFamily: "'Share Tech Mono',monospace", letterSpacing: "1px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ color: "#0000FF" }}>{token}</span>
-                  <span style={{ color: "#aaa" }}>{bal}</span>
+                  <span style={{ color: "var(--text-dim)" }}>{bal}</span>
                 </div>
               </div>
             ))
@@ -201,24 +186,24 @@ export default function AnalyticsPage() {
 
         {/* NOX Pool */}
         <div className="db db-stat">
-          <div className="stat-l" style={{ color: "#999" }}>NOX Pool Network</div>
+          <div className="stat-l">NOX Pool Network</div>
           <div className="stat-n" style={{ color: "#0000FF", fontSize: "28px", marginTop: "4px" }}>ACTIVE</div>
-          <div style={{ fontSize: "10px", color: "#555", marginTop: "8px", fontFamily: "'Share Tech Mono',monospace" }}>TEE Execution</div>
+          <div style={{ fontSize: "10px", color: "var(--text-muted)", marginTop: "8px", fontFamily: "'Share Tech Mono',monospace" }}>TEE Execution</div>
         </div>
       </div>
 
       {/* ROW 2 */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }} className="dash-grid-2">
-        <Suspense fallback={<div style={{ background: "#05050a", border: "1px solid #111", padding: "32px", color: "#333" }} className="mono">Loading Visualizer...</div>}>
+        <Suspense fallback={<div style={{ background: "var(--sidebar-bg)", border: "1px solid var(--border)", padding: "32px", color: "var(--border-soft)" }} className="mono">Loading Visualizer...</div>}>
           <TEEVisualizer />
         </Suspense>
-        <Suspense fallback={<div style={{ background: "#05050a", border: "1px solid #111", padding: "32px", color: "#333" }} className="mono">Loading AI Chat...</div>}>
+        <Suspense fallback={<div style={{ background: "var(--sidebar-bg)", border: "1px solid var(--border)", padding: "32px", color: "var(--border-soft)" }} className="mono">Loading AI Chat...</div>}>
           <ChainGPTChat />
         </Suspense>
       </div>
 
       {/* ROW 3 */}
-      <Suspense fallback={<div style={{ background: "#05050a", border: "1px solid #111", padding: "24px", color: "#333" }} className="mono">Loading feed...</div>}>
+      <Suspense fallback={<div style={{ background: "var(--sidebar-bg)", border: "1px solid var(--border)", padding: "24px", color: "var(--border-soft)" }} className="mono">Loading feed...</div>}>
         <LiveActivityFeed />
       </Suspense>
     </div>

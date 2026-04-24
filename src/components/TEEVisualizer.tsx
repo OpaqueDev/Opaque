@@ -21,7 +21,7 @@ export default function TEEVisualizer() {
     const iv = setInterval(() => {
       const s = Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
       setEncrypted(s);
-    }, 80);
+    }, 160);
     return () => clearInterval(iv);
   }, [running]);
 
@@ -37,10 +37,10 @@ export default function TEEVisualizer() {
   };
 
   return (
-    <div style={{ background: "#05050a", border: "1px solid #1a1a2e", padding: "32px" }}>
+    <div style={{ background: "var(--sidebar-bg)", border: "1px solid var(--border-strong)", padding: "32px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
         <div>
-          <div className="bc" style={{ fontSize: "20px", textTransform: "uppercase", letterSpacing: "1px", color: "#fff" }}>
+          <div className="bc" style={{ fontSize: "20px", textTransform: "uppercase", letterSpacing: "1px", color: "var(--foreground)" }}>
             Confidential Compute Visualizer
           </div>
           <div className="mono" style={{ fontSize: "10px", color: "#0000FF", marginTop: "4px", letterSpacing: "2px" }}>
@@ -52,7 +52,7 @@ export default function TEEVisualizer() {
           disabled={running}
           className="mono"
           style={{
-            background: running ? "#1a1a1a" : "#0000FF",
+            background: running ? "var(--border)" : "#0000FF",
             color: "#fff",
             border: "none",
             padding: "10px 20px",
@@ -71,7 +71,7 @@ export default function TEEVisualizer() {
 
       {/* Encrypted payload preview */}
       {running && (
-        <div className="mono" style={{ background: "#0a0a14", border: "1px solid rgba(0,0,255,0.2)", padding: "12px 16px", marginBottom: "24px", fontSize: "18px", color: "#0000FF", letterSpacing: "4px", textShadow: "0 0 10px rgba(0,0,255,0.8)", textAlign: "center" }}>
+        <div className="mono" style={{ background: "var(--surface-alt)", border: "1px solid rgba(0,0,255,0.2)", padding: "12px 16px", marginBottom: "24px", fontSize: "18px", color: "#0000FF", letterSpacing: "4px", textShadow: "0 0 10px rgba(0,0,255,0.8)", textAlign: "center" }}>
           {encrypted}
         </div>
       )}
@@ -89,15 +89,15 @@ export default function TEEVisualizer() {
                 alignItems: "center",
                 gap: "16px",
                 padding: "14px 16px",
-                background: isDone ? "rgba(0,0,255,0.08)" : "#0a0a0a",
-                border: `1px solid ${isCurrent ? "#0000FF" : isDone ? "rgba(0,0,255,0.3)" : "#1a1a1a"}`,
+                background: isDone ? "rgba(0,0,255,0.08)" : "var(--surface-alt)",
+                border: `1px solid ${isCurrent ? "#0000FF" : isDone ? "rgba(0,0,255,0.3)" : "var(--border)"}`,
                 transition: "all 0.4s ease",
                 animation: isCurrent ? "pulse 0.5s ease" : "none",
               }}
             >
               <div style={{
                 width: "36px", height: "36px",
-                border: `2px solid ${isDone ? "#0000FF" : "#222"}`,
+                border: `2px solid ${isDone ? "#0000FF" : "var(--border-soft)"}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: "18px",
                 background: isDone ? "rgba(0,0,255,0.2)" : "transparent",
@@ -107,10 +107,10 @@ export default function TEEVisualizer() {
                 {step.icon}
               </div>
               <div>
-                <div className="bc" style={{ fontSize: "14px", color: isDone ? "#fff" : "#444", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                <div className="bc" style={{ fontSize: "14px", color: isDone ? "var(--foreground)" : "var(--text-faint)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                   {step.label}
                 </div>
-                <div className="mono" style={{ fontSize: "10px", color: isDone ? "#0000FF" : "#333", marginTop: "2px" }}>
+                <div className="mono" style={{ fontSize: "10px", color: isDone ? "#0000FF" : "var(--border-soft)", marginTop: "2px" }}>
                   {step.sub}
                 </div>
               </div>

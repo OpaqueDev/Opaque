@@ -2,22 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function Home() {
   const [navOpen, setNavOpen] = useState(false);
 
-  // Background scripts
   useEffect(() => {
     const pixels = document.querySelectorAll('.hero-pixel') as NodeListOf<HTMLElement>;
-    const pixelIntervals = Array.from(pixels).map(p => {
-      return setInterval(() => {
-        p.style.opacity = Math.random() > 0.5 ? '1' : '0.3';
-      }, 600 + Math.random()*800);
-    });
-
-    return () => {
-      pixelIntervals.forEach(clearInterval);
-    };
+    // Single interval updates all pixels — far less overhead than 6 separate intervals
+    const iv = setInterval(() => {
+      pixels.forEach(p => {
+        if (Math.random() > 0.7) p.style.opacity = Math.random() > 0.5 ? '1' : '0.3';
+      });
+    }, 900);
+    return () => clearInterval(iv);
   }, []);
 
   return (
@@ -31,43 +29,49 @@ export default function Home() {
           <li><a href="#tech">Technology</a></li>
           <li><Link href="/docs" style={{ color: "inherit", textDecoration: "none" }}>Docs</Link></li>
         </ul>
-        <Link href="/dashboard" className="nav-cta" style={{ textDecoration: "none" }}>Launch App ↗</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <ThemeToggle />
+          <Link href="/dashboard" className="nav-cta" style={{ textDecoration: "none" }}>Launch App ↗</Link>
+        </div>
         <button className="hamburger" id="hamburger" aria-label="Menu" onClick={() => setNavOpen(!navOpen)}>
           <span></span><span></span><span></span>
         </button>
       </nav>
 
-      <div id="mobileNav" style={{ display: navOpen ? 'flex' : 'none', position: "fixed", inset: "0", background: "#080810", zIndex: 200, flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "32px" }}>
-        <button onClick={() => setNavOpen(false)} style={{ position: "absolute", top: "20px", right: "24px", background: "none", border: "none", color: "#fff", fontSize: "28px", cursor: "pointer" }}>✕</button>
-        <a href="#mission" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "#fff", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Mission</a>
-        <a href="#why" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "#fff", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Why Us</a>
-        <a href="#services" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "#fff", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Services</a>
-        <a href="#tech" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "#fff", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Technology</a>
+      {/* Mobile Nav */}
+      <div id="mobileNav" style={{ display: navOpen ? 'flex' : 'none', position: "fixed", inset: "0", background: "var(--bg-deep)", zIndex: 200, flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "32px" }}>
+        <button onClick={() => setNavOpen(false)} style={{ position: "absolute", top: "20px", right: "24px", background: "none", border: "none", color: "var(--foreground)", fontSize: "28px", cursor: "pointer" }}>✕</button>
+        <div style={{ position: "absolute", top: "20px", left: "24px" }}><ThemeToggle /></div>
+        <a href="#mission" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "var(--foreground)", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Mission</a>
+        <a href="#why" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "var(--foreground)", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Why Us</a>
+        <a href="#services" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "var(--foreground)", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Services</a>
+        <a href="#tech" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "var(--foreground)", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Technology</a>
         <Link href="/docs" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "#0000FF", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Docs</Link>
       </div>
 
+      {/* HERO */}
       <section className="hero">
         <div className="hero-left">
           <div>
             <div className="hero-tag">Arbitrum Sepolia · iExec Nox · ChainGPT</div>
             <h1 className="hero-h1">Prove<br/>Your Profit.<br/><em>Hide</em><br/>Your Balance.</h1>
             <p className="hero-sub" style={{ marginBottom: "24px" }}>The first DeFi protocol where you can share verified trading performance — without leaking a single number from your portfolio.</p>
-            
+
             <div className="hero-actions">
               <Link href="/dashboard" className="btn-primary" style={{ textDecoration: "none" }}>Enter App ↗</Link>
               <a href="#mission" className="btn-outline" style={{ textDecoration: "none" }}>Learn More</a>
             </div>
           </div>
-          <div style={{ borderTop: "2px solid #080810", paddingTop: "24px", display: "flex", gap: "32px", flexWrap: "wrap", marginTop: "40px" }}>
+          <div className="hero-stats">
             <div className="hero-stat">
               <div className="hero-stat-n">$0</div>
               <div className="hero-stat-l">Shield Fee</div>
             </div>
-            <div className="hero-stat" style={{ borderLeft: "2px solid #e0e0e0", paddingLeft: "24px" }}>
+            <div className="hero-stat">
               <div className="hero-stat-n">&lt;0.05%</div>
               <div className="hero-stat-l">Unwrap Fee</div>
             </div>
-            <div className="hero-stat" style={{ borderLeft: "2px solid #e0e0e0", paddingLeft: "24px" }}>
+            <div className="hero-stat">
               <div className="hero-stat-n">100%</div>
               <div className="hero-stat-l">TEE Enclave</div>
             </div>
@@ -77,7 +81,7 @@ export default function Home() {
           <div className="hero-badge">R+</div>
           <div style={{ position: "absolute", top: "30px", left: "40px", fontSize: "28px", color: "rgba(255,255,255,.3)" }}>✦</div>
           <div style={{ position: "absolute", bottom: "60px", right: "60px", fontSize: "18px", color: "rgba(255,255,255,.2)" }}>✦</div>
-          
+
           <div className="hero-pixel" style={{ top: "20%", left: "15%" }}></div>
           <div className="hero-pixel" style={{ top: "35%", left: "85%" }}></div>
           <div className="hero-pixel" style={{ top: "70%", left: "10%" }}></div>
@@ -94,18 +98,15 @@ export default function Home() {
               <div className="cube-face bottom"></div>
             </div>
           </div>
-          <div className="hero-right-text" style={{ background: "rgba(0,0,255,0.05)", border: "1px solid rgba(0,0,255,0.2)", padding: "20px", backdropFilter: "blur(4px)" }}>
-            <div style={{ fontSize: "10px", color: "#0000FF", textTransform: "uppercase", letterSpacing: "2px", marginBottom: "8px", fontFamily: "'Share Tech Mono', monospace" }}>Live Alpha Proof</div>
-            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: "clamp(36px, 6vw, 52px)", color: "#00ffff", lineHeight: 1, textShadow: "0 0 20px rgba(0,255,255,0.5)", marginBottom: "8px" }}>+18.43%</div>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", fontFamily: "'Share Tech Mono', monospace", fontSize: "10px", color: "#4ade80" }}>
-              <span style={{ animation: "pulse 2s infinite" }}>●</span> CRYPTOGRAPHICALLY VERIFIED
-            </div>
-            <p style={{ marginTop: "12px", fontSize: "12px" }}>Balance remains completely hidden within TEE enclave.</p>
+          <div className="hero-right-text" style={{ background: "rgba(0,0,255,0.05)", border: "1px solid rgba(0,0,255,0.2)", padding: "20px" }}>
+            <div style={{ textAlign: "center", marginBottom: "12px", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: "20px", color: "#fff", letterSpacing: "1px", textTransform: "uppercase" }}>Confidential Layer Active</div>
+            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.75)", lineHeight: 1.6, fontFamily: "'Inter', sans-serif", textAlign: "center" }}>iExec Nox wraps your assets in a cryptographic shield. Trade freely. Share only proof.</p>
           </div>
           <div className="hero-corner">SYS:ONLINE · BLOCK #19,482,301</div>
         </div>
       </section>
 
+      {/* MARQUEE */}
       <div className="marquee-wrap">
         <div className="marquee-inner" id="marquee">
           <span className="marquee-item">Verify Performance</span><span className="marquee-sep">✦</span>
@@ -123,6 +124,7 @@ export default function Home() {
         </div>
       </div>
 
+      {/* MISSION */}
       <section className="mission" id="mission">
         <div className="mission-left">
           <div>
@@ -140,31 +142,43 @@ export default function Home() {
         </div>
         <div className="mission-right">
           <div>
+            {/* Privacy Ring with spinning orbits */}
             <div style={{ textAlign: "center", marginBottom: "32px" }}>
               <div className="privacy-ring">
+                {/* Center text */}
                 <div style={{ position: "relative", zIndex: 2, textAlign: "center" }}>
                   <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: "40px", fontWeight: 900, color: "#0000FF", lineHeight: 1 }}>100%</div>
-                  <div style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "2px", color: "#999", marginTop: "2px" }}>Privacy</div>
+                  <div style={{ fontSize: "10px", textTransform: "uppercase", letterSpacing: "2px", color: "var(--text-dim)", marginTop: "2px" }}>Privacy</div>
                 </div>
-                <div className="orbit-dot" style={{ top: "-6px", left: "50%", transform: "translateX(-50%)" }}></div>
-                <div className="orbit-dot" style={{ bottom: "-6px", left: "50%", transform: "translateX(-50%)", background: "#080810" }}></div>
-                <div className="orbit-dot" style={{ left: "-6px", top: "50%", transform: "translateY(-50%)", background: "#ccc" }}></div>
+
+                {/* Orbit 1 — outer ring, clockwise */}
+                <div style={{ position: "absolute", inset: 0, borderRadius: "50%", animation: "orbit-spin 10s linear infinite", willChange: "transform" }}>
+                  <div className="orbit-dot" style={{ top: "-6px", left: "50%", transform: "translateX(-50%)" }}></div>
+                </div>
+
+                {/* Orbit 2 — middle ring, counter-clockwise */}
+                <div style={{ position: "absolute", inset: "20px", borderRadius: "50%", animation: "orbit-spin 16s linear infinite reverse", willChange: "transform" }}>
+                  <div className="orbit-dot" style={{ top: "-6px", left: "50%", transform: "translateX(-50%)", background: "var(--bg-deep)", border: "2px solid #0000FF", width: "10px", height: "10px" }}></div>
+                </div>
               </div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", border: "1px solid #12121e" }}>
-              <div style={{ padding: "16px", borderRight: "1px solid #12121e", background: "#07070f" }}>
+
+            {/* A+ / 0.0s boxes */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", border: "1px solid var(--border-strong)" }}>
+              <div style={{ padding: "16px", borderRight: "1px solid var(--border-strong)", background: "var(--surface)" }}>
                 <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "28px", color: "#0000FF" }}>A+</div>
-                <div style={{ fontSize: "11px", color: "#999", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>Safety Score</div>
+                <div style={{ fontSize: "11px", color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>Safety Score</div>
               </div>
-              <div style={{ padding: "16px", background: "#07070f" }}>
-                <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "28px", color: "#fff" }}>0.0s</div>
-                <div style={{ fontSize: "11px", color: "#999", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>Latency</div>
+              <div style={{ padding: "16px", background: "var(--surface)" }}>
+                <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "28px", color: "var(--foreground)" }}>0.0s</div>
+                <div style={{ fontSize: "11px", color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: "1px", marginTop: "2px" }}>Latency</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* WHY */}
       <section className="why" id="why">
         <div className="why-header">
           <h2 className="why-h2">Why<br/>Choose<br/>Us? ✦</h2>
@@ -194,6 +208,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* SERVICES */}
       <section className="services" id="services">
         <div className="services-top">
           <div className="section-label">Our Services</div>
@@ -209,7 +224,7 @@ export default function Home() {
             <Link className="service-link" href="/dashboard/shield">Get Started →</Link>
           </div>
           <div className="service-card">
-            <div className="service-icon" style={{ background: "#080810" }}>
+            <div className="service-icon" style={{ background: "var(--icon-dark)" }}>
               <svg className="service-icon-svg" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
             </div>
             <div className="service-title">PnL Analytics</div>
@@ -224,7 +239,7 @@ export default function Home() {
             <div className="service-body">ChainGPT-powered safety scoring grades your portfolio from A to F across rug risk, smart contract exposure, and market volatility.</div>
             <a className="service-link" href="#tech">Learn More →</a>
           </div>
-          <div className="service-card" style={{ background: "#0000FF", borderTop: "2px solid #080810" }}>
+          <div className="service-card" style={{ background: "#0000FF", borderTop: "2px solid var(--border-strong)" }}>
             <div className="service-icon" style={{ background: "#fff" }}>
               <svg className="service-icon-svg" style={{ stroke: "#0000FF" }} viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
             </div>
@@ -233,7 +248,7 @@ export default function Home() {
             <Link className="service-link" href="/dashboard" style={{ color: "#fff" }}>Try It Free →</Link>
           </div>
           <div className="service-card">
-            <div className="service-icon" style={{ background: "#080810" }}>
+            <div className="service-icon" style={{ background: "var(--icon-dark)" }}>
               <svg className="service-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
             </div>
             <div className="service-title">Trade History</div>
@@ -251,24 +266,25 @@ export default function Home() {
         </div>
       </section>
 
+      {/* RESULTS */}
       <section className="results" id="results">
         <div className="results-header">
           <div className="section-label">Proven Results</div>
           <h2 className="results-h2">Proven<br/><em>Results</em></h2>
         </div>
-        <div style={{ border: "1px solid #12121e" }}>
-          <div className="results-grid" style={{ border: "none", borderBottom: "1px solid #12121e" }}>
+        <div style={{ border: "1px solid var(--border-strong)" }}>
+          <div className="results-grid" style={{ border: "none", borderBottom: "1px solid var(--border-strong)" }}>
             <div className="result-cell">
               <div className="result-n">$12M+</div>
               <div className="result-l">Assets Shielded</div>
               <div className="result-desc">Total value locked in confidential contracts across all active users.</div>
             </div>
-            <div className="result-cell" style={{ borderRight: "1px solid #12121e" }}>
+            <div className="result-cell" style={{ borderRight: "1px solid var(--border-strong)" }}>
               <div className="result-n">4,800+</div>
               <div className="result-l">Wallets Protected</div>
               <div className="result-desc">DeFi traders who&apos;ve moved their portfolio into OPAQUE&apos;s confidential layer.</div>
             </div>
-            <div className="result-cell" style={{ borderRight: "1px solid #12121e" }}>
+            <div className="result-cell" style={{ borderRight: "1px solid var(--border-strong)" }}>
               <div className="result-n">99.9%</div>
               <div className="result-l">Uptime</div>
               <div className="result-desc">Zero downtime incidents. Privacy layer stays live even during peak congestion.</div>
@@ -294,6 +310,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* TECH */}
       <section className="tech" id="tech">
         <div className="section-label">Technology Stack</div>
         <h2 className="tech-h2">We Employ<br/>The Most<br/>Advanced<br/>Technologies</h2>
@@ -306,18 +323,19 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <div style={{ marginTop: "48px", borderTop: "1px solid #12121e", paddingTop: "40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", borderLeft: "1px solid #12121e", borderRight: "1px solid #12121e", borderBottom: "1px solid #12121e" }}>
-          <div style={{ padding: "24px 28px", borderRight: "1px solid #12121e" }}>
-            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: "18px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px" }}>iExec Nox SDK</div>
-            <div style={{ fontSize: "13px", color: "#666", lineHeight: 1.7 }}>Nox enables confidential wrapping of any ERC-20 token. Assets are computationally shielded within a Trusted Execution Environment (TEE).</div>
+        <div style={{ marginTop: "48px", borderTop: "1px solid var(--border-strong)", paddingTop: "40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", border: "1px solid var(--border-strong)" }}>
+          <div style={{ padding: "24px 28px", borderRight: "1px solid var(--border-strong)", background: "var(--surface)" }}>
+            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: "18px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", color: "var(--foreground)" }}>iExec Nox SDK</div>
+            <div style={{ fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.7 }}>Nox enables confidential wrapping of any ERC-20 token. Assets are computationally shielded within a Trusted Execution Environment (TEE).</div>
           </div>
-          <div style={{ padding: "24px 28px" }}>
-            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: "18px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", color: "#fff" }}>ChainGPT Audit API</div>
-            <div style={{ fontSize: "13px", color: "#666", lineHeight: 1.7 }}>Real-time AI scoring of portfolio risk across 50+ smart contract vulnerability vectors, continuously updated on every block.</div>
+          <div style={{ padding: "24px 28px", background: "var(--surface)" }}>
+            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: "18px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", color: "var(--foreground)" }}>ChainGPT Audit API</div>
+            <div style={{ fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.7 }}>Real-time AI scoring of portfolio risk across 50+ smart contract vulnerability vectors, continuously updated on every block.</div>
           </div>
         </div>
       </section>
 
+      {/* CTA */}
       <section className="cta-section" id="cta">
         <div className="cta-bg-text">OPAQUE OPAQUE</div>
         <div className="cta-inner">
@@ -335,11 +353,12 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FOOTER */}
       <footer>
         <div className="footer-top">
           <div>
-            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "22px", color: "#fff", letterSpacing: "-1px", marginBottom: "12px" }}>OPAQUE_</div>
-            <div style={{ fontSize: "13px", color: "#555", lineHeight: 1.7, maxWidth: "200px" }}>Privacy-first DeFi analytics. Powered by iExec Nox &amp; ChainGPT.</div>
+            <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "22px", color: "var(--foreground)", letterSpacing: "-1px", marginBottom: "12px" }}>OPAQUE_</div>
+            <div style={{ fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.7, maxWidth: "200px" }}>Privacy-first DeFi analytics. Powered by iExec Nox &amp; ChainGPT.</div>
           </div>
           <div>
             <div className="footer-col-title">Platform</div>
@@ -365,7 +384,7 @@ export default function Home() {
         </div>
         <div className="footer-bottom">
           <p><span className="dot"></span>© 2026 Opaque Finance. All rights reserved.</p>
-          <p style={{ color: "#333" }}>Privacy Policy · Terms · Built for iExec Vibe Coding Hackathon</p>
+          <p style={{ color: "var(--text-faint)" }}>Privacy Policy · Terms · Built for iExec Vibe Coding Hackathon</p>
         </div>
       </footer>
     </>

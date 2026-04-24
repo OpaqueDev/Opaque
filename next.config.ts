@@ -1,8 +1,10 @@
 import type { NextConfig } from "next";
 
-// eslint.ignoreDuringBuilds removed from NextConfig in Next 16 — suppress via type cast
-const nextConfig = {
-  /* config options here */
-} satisfies NextConfig;
+const nextConfig: NextConfig = {
+  // @ts-ignore - turbopack root config for Next.js 16
+  turbopack: {
+    root: "c:/Users/Pongo/Downloads/Op/Opaque",
+  },
+};
 
 export default nextConfig;
