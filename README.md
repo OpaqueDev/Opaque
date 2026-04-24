@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://www.opaque.site/"><strong>Live Demo - www.opaque.site</strong></a>
   &nbsp;
-  <a href="https://github.com/Dwica2004/opque">GitHub</a>
+  <a href="https://github.com/OpaqueDev/Opaque">GitHub</a>
   &nbsp;
   <a href="./WHITEPAPER.md">Whitepaper</a>
 </p>
@@ -329,7 +329,7 @@ Body:     { "question": "Is ETH in a TEE safer than cold storage?" }
 
 ```bash
 # Clone the repo
-git clone https://github.com/Dwica2004/opque.git
+git clone https://github.com/OpaqueDev/Opaque.git
 cd opque
 
 # Install dependencies (legacy-peer-deps required for RainbowKit compatibility)
@@ -511,7 +511,7 @@ Q4 2026  v1.0
 
 ### Reporting Issues
 
-Found a bug? [Open an issue](https://github.com/Dwica2004/opque/issues) or DM via Discord.
+Found a bug? [Open an issue](https://github.com/OpaqueDev/Opaque/issues) or DM via Discord.
 
 ## Contributing
 

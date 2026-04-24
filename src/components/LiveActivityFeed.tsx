@@ -48,29 +48,31 @@ export default function LiveActivityFeed() {
         <div className="mono" style={{ marginLeft: "auto", fontSize: "9px", color: "#4ade80" }}>STREAMING</div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "6px", overflow: "hidden" }}>
         {feed.map((item, i) => (
           <div
             key={i}
-            className="mono"
+            className="mono activity-row"
             style={{
-              display: "flex",
+              display: "grid",
+              gridTemplateColumns: "72px 80px 44px 1fr 80px 60px",
               alignItems: "center",
-              gap: "10px",
+              gap: "8px",
               padding: "8px 12px",
               background: i === 0 ? "rgba(0,0,255,0.06)" : "transparent",
               border: `1px solid ${i === 0 ? "rgba(0,0,255,0.2)" : "var(--border)"}`,
               fontSize: "11px",
               animation: i === 0 ? "fade-in 0.4s ease" : "none",
               transition: "all 0.3s",
+              overflow: "hidden",
             }}
           >
-            <span style={{ color: "#0000FF", minWidth: "72px" }}>{item.verb}</span>
-            <span style={{ color: "var(--foreground)" }}>{item.amount}</span>
+            <span style={{ color: "#0000FF", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.verb}</span>
+            <span style={{ color: "var(--foreground)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.amount}</span>
             <span style={{ color: "var(--text-dim)" }}>{item.token}</span>
-            <span style={{ color: "var(--text-muted)", flex: 1 }}>{item.addr}</span>
-            <span style={{ color: item.status.color, minWidth: "72px", textAlign: "right" }}>{item.status.label}</span>
-            <span style={{ color: "var(--border-soft)", minWidth: "56px", textAlign: "right" }}>{item.ts}</span>
+            <span style={{ color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.addr}</span>
+            <span style={{ color: item.status.color, textAlign: "right", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.status.label}</span>
+            <span className="activity-ts" style={{ color: "var(--border-soft)", textAlign: "right", whiteSpace: "nowrap" }}>{item.ts}</span>
           </div>
         ))}
       </div>

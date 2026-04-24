@@ -375,7 +375,7 @@ export default function Home() {
               <li><a href="https://docs.iex.ec/nox-protocol/" target="_blank" rel="noreferrer">Nox Documentation</a></li>
               <li><a href="https://dorahacks.io/hackathon/vibe-coding-iexec/detail" target="_blank" rel="noreferrer">Hackathon Details</a></li>
               <li><a href="https://www.chaingpt.org/api" target="_blank" rel="noreferrer">ChainGPT API</a></li>
-              <li><a href="https://github.com/Dwica2004/opque" target="_blank" rel="noreferrer">GitHub</a></li>
+              <li><a href="https://github.com/OpaqueDev/Opaque" target="_blank" rel="noreferrer">GitHub</a></li>
             </ul>
           </div>
         </div>

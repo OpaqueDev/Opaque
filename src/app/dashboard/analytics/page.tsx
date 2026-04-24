@@ -193,7 +193,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* ROW 2 */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }} className="dash-grid-2">
+      <div className="dash-grid-2">
         <Suspense fallback={<div style={{ background: "var(--sidebar-bg)", border: "1px solid var(--border)", padding: "32px", color: "var(--border-soft)" }} className="mono">Loading Visualizer...</div>}>
           <TEEVisualizer />
         </Suspense>
