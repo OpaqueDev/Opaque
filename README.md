@@ -1,13 +1,8 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Network-Arbitrum%20Sepolia-blue?style=for-the-badge&logo=ethereum" />
-  <img src="https://img.shields.io/badge/TEE-iExec%20Nox%20SGX-0000FF?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/AI-ChainGPT-blueviolet?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Stack-Next.js%2016-black?style=for-the-badge&logo=nextdotjs" />
-  <img src="https://img.shields.io/badge/Wallet-RainbowKit-blue?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" />
+  <img src="public/banner.png" width="100%" />
 </p>
 
-<h1 align="center">🔒 OPAQUE — Proof of Alpha Protocol</h1>
+<h1 align="center">OPAQUE — Proof of Alpha Protocol</h1>
 
 <p align="center">
   <b>Prove your profit. Hide your balance.</b><br/>
@@ -15,37 +10,33 @@
 </p>
 
 <p align="center">
-  <a href="https://opaque-eight.vercel.app"><strong>🌐 Live Demo → opaque-eight.vercel.app</strong></a>
-  &nbsp;·&nbsp;
+  <a href="https://opaque-eight.vercel.app"><strong>Live Demo — opaque-eight.vercel.app</strong></a>
+  &nbsp;
   <a href="https://github.com/Dwica2004/opque">GitHub</a>
-  &nbsp;·&nbsp;
+  &nbsp;
   <a href="./WHITEPAPER.md">Whitepaper</a>
 </p>
 
----
-
 ## Table of Contents
 
-1. [What is OPAQUE?](#-what-is-opaque)
-2. [The Problem](#-the-problem)
-3. [How It Works](#-how-it-works)
-4. [Feature Matrix](#-feature-matrix)
-5. [Architecture](#-architecture)
-6. [Smart Contract](#-smart-contract)
-7. [Cryptographic Proof](#-cryptographic-proof-system)
-8. [TEE Computing Layer](#-tee-computing-layer-iexec-nox)
-9. [AI Risk Layer](#-ai-risk-layer-chaingpt)
-10. [Tech Stack](#-tech-stack)
-11. [Getting Started](#-getting-started)
-12. [Environment Variables](#-environment-variables)
-13. [Deployment](#-deployment)
-14. [API Reference](#-api-reference)
-15. [Roadmap](#-roadmap)
-16. [Contributing](#-contributing)
+1. [What is OPAQUE?](#what-is-opaque)
+2. [The Problem](#the-problem)
+3. [How It Works](#how-it-works)
+4. [Feature Matrix](#feature-matrix)
+5. [Architecture](#architecture)
+6. [Smart Contract](#smart-contract)
+7. [Cryptographic Proof](#cryptographic-proof-system)
+8. [TEE Computing Layer](#tee-computing-layer-iexec-nox)
+9. [AI Risk Layer](#ai-risk-layer-chaingpt)
+10. [Tech Stack](#tech-stack)
+11. [Getting Started](#getting-started)
+12. [Environment Variables](#environment-variables)
+13. [Deployment](#deployment)
+14. [API Reference](#api-reference)
+15. [Roadmap](#roadmap)
+16. [Contributing](#contributing)
 
----
-
-## 🧠 What is OPAQUE?
+## What is OPAQUE?
 
 OPAQUE is a **Proof of Alpha Protocol** — a full-stack Web3 dApp that lets DeFi traders cryptographically prove their portfolio performance to **anyone**, without revealing their actual balance, wallet, or holdings.
 
@@ -53,9 +44,7 @@ OPAQUE is a **Proof of Alpha Protocol** — a full-stack Web3 dApp that lets DeF
 
 Built on **iExec Nox Trusted Execution Environments (TEE)**, portfolio computations run inside Intel SGX hardware enclaves — completely sealed from the node operator, the network, and even the OPAQUE team. The output is a **deterministic SHA-256 Alpha Proof** — verifiable by anyone, reversible by no one.
 
----
-
-## 😤 The Problem
+## The Problem
 
 In DeFi, every on-chain action is public. A great trader **cannot prove their alpha** without doxxing their entire portfolio:
 
@@ -77,50 +66,44 @@ In DeFi, every on-chain action is public. A great trader **cannot prove their al
 
 **OPAQUE solves this**: prove `+143% PnL in 90 days` — with a hash anyone can verify — but zero information about your balance leaks.
 
----
-
-## ⚙️ How It Works
+## How It Works
 
 ```
-1. 🛡️  SHIELD      Deposit ERC-20 tokens into OpaqueVault.sol (on-chain)
-2. 🔒  COMPUTE     iExec Nox enclave calculates net yield (off-chain, sealed)
-3. 🔑  ATTEST      SHA-256 Alpha Proof is generated: sha256(wallet + initial + pnl)
-4. 📤  SHARE       Proof is distributed — Twitter, Discord, DAOs, anywhere
-5. ✅  VERIFY      Anyone recomputes sha256(wallet + initial + pnl) and checks match
+1. SHIELD      Deposit ERC-20 tokens into OpaqueVault.sol (on-chain)
+2. COMPUTE     iExec Nox enclave calculates net yield (off-chain, sealed)
+3. ATTEST      SHA-256 Alpha Proof is generated: sha256(wallet + initial + pnl)
+4. SHARE       Proof is distributed — Twitter, Discord, DAOs, anywhere
+5. VERIFY      Anyone recomputes sha256(wallet + initial + pnl) and checks match
 ```
 
 **What is revealed:** Your yield percentage (you choose to share this)  
 **What stays hidden:** Your actual balance, holdings, and wallet strategy
 
----
-
-## ✨ Feature Matrix
+## Feature Matrix
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| 🔒 **Asset Shielding** | ✅ Live | Deposit ERC-20s into `OpaqueVault.sol` on Arbitrum Sepolia |
-| ⬡ **TEE Confidential Compute** | ✅ Live | iExec Nox SGX enclave integration with real SDK |
-| 🧬 **Alpha Proof (SHA-256)** | ✅ Live | `sha256(wallet + initial + pnl)` — deterministic, verifiable |
-| ✔️ **Proof Verification** | ✅ Live | Anyone can independently recompute and verify the proof |
-| 🤖 **ChainGPT AI Risk Audit** | ✅ Live | Real-time portfolio risk scoring via ChainGPT API |
-| 💬 **ChainGPT AI Chat** | ✅ Live | Interactive DeFi risk assistant powered by ChainGPT |
-| 📊 **Live Activity Feed** | ✅ Live | Real-time shield/proof event stream |
-| 🎬 **TEE Visualizer** | ✅ Live | Animated step-by-step confidential compute flow |
-| 📤 **Alpha Card Share** | ✅ Live | Download proof as PNG / copy for Twitter/Discord |
-| 🔗 **Smart Contract** | ✅ Deployed | `OpaqueVault.sol` live on Arbitrum Sepolia |
-| 📱 **Mobile Responsive** | ✅ Live | Full responsive layout with glassmorphism sidebar |
-| 🌐 **RainbowKit Wallet** | ✅ Live | MetaMask + WalletConnect (QR) integration |
+| **Asset Shielding** | Live | Deposit ERC-20s into `OpaqueVault.sol` on Arbitrum Sepolia |
+| **TEE Confidential Compute** | Live | iExec Nox SGX enclave integration with real SDK |
+| **Alpha Proof (SHA-256)** | Live | `sha256(wallet + initial + pnl)` — deterministic, verifiable |
+| **Proof Verification** | Live | Anyone can independently recompute and verify the proof |
+| **ChainGPT AI Risk Audit** | Live | Real-time portfolio risk scoring via ChainGPT API |
+| **ChainGPT AI Chat** | Live | Interactive DeFi risk assistant powered by ChainGPT |
+| **Live Activity Feed** | Live | Real-time shield/proof event stream |
+| **TEE Visualizer** | Live | Animated step-by-step confidential compute flow |
+| **Alpha Card Share** | Live | Download proof as PNG / copy for Twitter/Discord |
+| **Smart Contract** | Deployed | `OpaqueVault.sol` live on Arbitrum Sepolia |
+| **Mobile Responsive** | Live | Full responsive layout with glassmorphism sidebar |
+| **RainbowKit Wallet** | Live | MetaMask + WalletConnect (QR) integration |
 
----
-
-## 🏗️ Architecture
+## Architecture
 
 ### System Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         OPAQUE STACK                                │
-├────────────────────┬─────────────────────┬──────────────────────────┤
+│ ├────────────────────┬─────────────────────┬──────────────────────────┤
 │    PRESENTATION    │       BACKEND        │     BLOCKCHAIN LAYER     │
 │                    │                      │                          │
 │  Next.js 16        │  /api/compute        │  OpaqueVault.sol         │
@@ -156,9 +139,7 @@ User Input (wallet, initial_value, final_value)
               → Share to Twitter/Discord
 ```
 
----
-
-## 📄 Smart Contract
+## Smart Contract
 
 **`OpaqueVault.sol`** — Deployed on Arbitrum Sepolia
 
@@ -200,9 +181,7 @@ event AssetUnshielded(address indexed recipient, address indexed token, uint256 
 | `encryptedPayload` in `shield()` | Hides routing intent from mempool observers |
 | `setTEEOracle()` available | Multisig can rotate oracle without vault redeployment |
 
----
-
-## 🔑 Cryptographic Proof System
+## Cryptographic Proof System
 
 ### Alpha Proof Construction
 
@@ -219,10 +198,10 @@ const proof = crypto
 ```
 
 **Properties:**
-- ✅ **Deterministic** — Same inputs always produce same hash
-- ✅ **Reproducible** — Any third party can verify with public inputs
-- ✅ **One-way** — Cannot derive balance from proof ID alone
-- ✅ **Unique** — Collision probability: 1 in 2^256
+- **Deterministic** — Same inputs always produce same hash
+- **Reproducible** — Any third party can verify with public inputs
+- **One-way** — Cannot derive balance from proof ID alone
+- **Unique** — Collision probability: 1 in 2^256
 
 ### Verification Process
 
@@ -236,28 +215,26 @@ Anyone can verify an Alpha Proof in 3 steps:
 echo -n "0xABC...100000143.5" | sha256sum
 
 # Step 3: Compare with published Proof ID
-# Match ✅ = authentic  |  No match ❌ = fraudulent
+# Match = authentic  |  No match = fraudulent
 ```
 
 ### Privacy Guarantee
 
 The Alpha Proof reveals **only what the prover chooses to disclose**. Typically:
-- ✅ Revealed: PnL percentage (e.g., `+143%`)
-- ❌ Hidden: Absolute balance (e.g., `$1.2M`)
-- ❌ Hidden: Individual positions
-- ❌ Hidden: Strategy composition
+- Revealed: PnL percentage (e.g., `+143%`)
+- Hidden: Absolute balance (e.g., `$1.2M`)
+- Hidden: Individual positions
+- Hidden: Strategy composition
 
----
-
-## 🔐 TEE Computing Layer (iExec Nox)
+## TEE Computing Layer (iExec Nox)
 
 ### What is iExec Nox?
 
 iExec Nox is a confidential computing platform that executes code inside **Intel SGX hardware enclaves** — sealed CPU environments where:
 
-- 🔒 Memory is encrypted at the hardware level
-- 👁️ Not even the node operator can see computation state
-- 📜 All outputs carry a hardware-backed cryptographic attestation
+- Memory is encrypted at the hardware level
+- Not even the node operator can see computation state
+- All outputs carry a hardware-backed cryptographic attestation
 
 ### OPAQUE's Integration Model
 
@@ -282,16 +259,14 @@ OpaqueVault.unshield() ← Only callable with valid TEE attestation
 
 | Property | Traditional | iExec Nox TEE |
 |----------|-------------|---------------|
-| Node can read data | ✅ Yes (risk) | ❌ No (sealed) |
-| Output integrity | ❌ Trust-based | ✅ Hardware-attested |
-| Operator can manipulate | ✅ Yes | ❌ No |
-| Audit trail | ❌ Off-chain | ✅ On-chain + attested |
+| Node can read data | Yes (risk) | No (sealed) |
+| Output integrity | Trust-based | Hardware-attested |
+| Operator can manipulate | Yes | No |
+| Audit trail | Off-chain | On-chain + attested |
 
 > **Current status:** OPAQUE v0.1 implements the full iExec SDK integration layer with TEE simulation mode. Real SGX enclave dispatch is the primary target for v0.2.
 
----
-
-## 🤖 AI Risk Layer (ChainGPT)
+## AI Risk Layer (ChainGPT)
 
 ### Portfolio Risk Audit
 
@@ -325,9 +300,7 @@ Body:     { "question": "Is ETH in a TEE safer than cold storage?" }
 - "How does TEE Attestation verify PnL?"
 - "Rate my USDC/ETH/ARB portfolio risk."
 
----
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Layer | Technology | Version |
 |-------|-----------|---------|
@@ -343,9 +316,7 @@ Body:     { "question": "Is ETH in a TEE safer than cold storage?" }
 | **Share** | html2canvas | 1.4 |
 | **Hosting** | Vercel | Edge |
 
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -366,7 +337,7 @@ npm install --legacy-peer-deps
 
 # Set up environment variables
 cp .env.example .env.local
-# → Edit .env.local with your keys (see below)
+# Edit .env.local with your keys (see below)
 
 # Run development server
 npm run dev
@@ -374,9 +345,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
----
-
-## 🔑 Environment Variables
+## Environment Variables
 
 Create `.env.local` in the root directory:
 
@@ -395,15 +364,13 @@ NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID="your-walletconnect-project-id"
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `CHAINGPT_API_KEY` | ✅ Yes | Enables AI risk audit + chat |
-| `NEXT_PUBLIC_VAULT_ADDRESS` | ✅ Yes | Smart contract address |
-| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | ⚠️ Recommended | Without this, only MetaMask (injected) works |
+| `CHAINGPT_API_KEY` | Yes | Enables AI risk audit + chat |
+| `NEXT_PUBLIC_VAULT_ADDRESS` | Yes | Smart contract address |
+| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | Recommended | Without this, only MetaMask (injected) works |
 
 > **Security note:** Never commit `.env.local` to git. The `.gitignore` already excludes it.
 
----
-
-## 📦 Deployment
+## Deployment
 
 ### Deploy to Vercel (Recommended)
 
@@ -437,9 +404,7 @@ EXPOSE 3000
 CMD ["npm", "start"]
 ```
 
----
-
-## 📡 API Reference
+## API Reference
 
 ### `POST /api/compute`
 
@@ -464,8 +429,6 @@ Generate an Alpha Proof from portfolio data.
 }
 ```
 
----
-
 ### `POST /api/chaingpt`
 
 **Chat Mode** — Ask ChainGPT a DeFi question:
@@ -479,8 +442,6 @@ Generate an Alpha Proof from portfolio data.
 ```json
 { "answer": "TEE provides hardware-level isolation which..." }
 ```
-
----
 
 **Audit Mode** — Get portfolio risk score (no body needed):
 
@@ -502,39 +463,35 @@ Generate an Alpha Proof from portfolio data.
 
 > **Credit cost:** 0.5 credits per call. Chat history disabled by default to save credits.
 
----
-
-## 🗺️ Roadmap
+## Roadmap
 
 ```
-Q2 2026 ── v0.1 (CURRENT) ────────────────────────────────────────
-            ✅ OpaqueVault.sol deployed on Arbitrum Sepolia
-            ✅ SHA-256 Alpha Proof generation + verification
-            ✅ iExec Nox SDK integration layer (simulation mode)
-            ✅ ChainGPT AI risk audit + interactive chat
-            ✅ TEE Visualizer animation
-            ✅ Alpha Card (PNG download / social share)
-            ✅ RainbowKit wallet connection (MetaMask + WalletConnect)
-            ✅ Mobile responsive UI
+Q2 2026  v0.1 (CURRENT)
+            OpaqueVault.sol deployed on Arbitrum Sepolia
+            SHA-256 Alpha Proof generation + verification
+            iExec Nox SDK integration layer (simulation mode)
+            ChainGPT AI risk audit + interactive chat
+            TEE Visualizer animation
+            Alpha Card (PNG download / social share)
+            RainbowKit wallet connection (MetaMask + WalletConnect)
+            Mobile responsive UI
 
-Q3 2026 ── v0.2 ───────────────────────────────────────────────────
-            ◻ Real iExec SGX task dispatch (full on-chain TEE)
-            ◻ Stealth deposit addresses (mask shield() events)
-            ◻ Mainnet deploy (Arbitrum One)
-            ◻ Alpha Badge NFT contract
-            ◻ Multi-token vault support
+Q3 2026  v0.2
+            Real iExec SGX task dispatch (full on-chain TEE)
+            Stealth deposit addresses (mask shield() events)
+            Mainnet deploy (Arbitrum One)
+            Alpha Badge NFT contract
+            Multi-token vault support
 
-Q4 2026 ── v1.0 ───────────────────────────────────────────────────
-            ◻ ZK-SNARK proofs (replace SHA-256 with Groth16)
-            ◻ $OPQ governance token launch
-            ◻ DAO governance activation
-            ◻ Institutional API access tier
-            ◻ Cross-chain support (Base, Optimism, zkSync)
+Q4 2026  v1.0
+            ZK-SNARK proofs (replace SHA-256 with Groth16)
+            $OPQ governance token launch
+            DAO governance activation
+            Institutional API access tier
+            Cross-chain support (Base, Optimism, zkSync)
 ```
 
----
-
-## 🔐 Security
+## Security
 
 ### Threat Model
 
@@ -556,9 +513,7 @@ Q4 2026 ── v1.0 ────────────────────
 
 Found a bug? [Open an issue](https://github.com/Dwica2004/opque/issues) or DM via Discord.
 
----
-
-## 🤝 Contributing
+## Contributing
 
 ```bash
 # Fork the repo
@@ -573,21 +528,17 @@ git push origin feature/your-feature-name
 ```
 
 **Contribution areas we want help with:**
-- 🧮 ZK-SNARK circuit implementation (Circom / Noir)
-- 🔗 Real iExec task dispatch integration
-- 📊 Historical PnL tracking & analytics
-- 🌐 Multi-language support
+- ZK-SNARK circuit implementation (Circom / Noir)
+- Real iExec task dispatch integration
+- Historical PnL tracking & analytics
+- Multi-language support
 
----
-
-## 📜 License
+## License
 
 MIT © 2026 OPAQUE Protocol Team
 
----
-
 <p align="center">
   <b>OPAQUE Protocol — Proof of Alpha</b><br/>
-  Built for the <a href="https://dorahacks.io">iExec × ChainGPT Vibe Coding Hackathon</a> · Dorahacks · April 2026<br/><br/>
+  Built for the <a href="https://dorahacks.io">iExec × ChainGPT Vibe Coding Hackathon</a> &nbsp; Dorahacks &nbsp; April 2026<br/><br/>
   <i>"Prove your profit. Hide your balance."</i>
 </p>
