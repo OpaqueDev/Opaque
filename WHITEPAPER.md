@@ -91,7 +91,7 @@ Anyone who receives an Alpha Proof can independently reconstruct the hash from p
 ├────────────────┬───────────────────────┬───────────────────────┤
 │   PRESENTATION │      BACKEND          │    BLOCKCHAIN LAYER    │
 │                │                       │                        │
-│  Next.js 15    │  /api/compute         │  OpaqueVault.sol       │
+│  Next.js 16    │  /api/compute         │  OpaqueVault.sol       │
 │  wagmi v2      │  SHA-256 attestation  │  Arbitrum Sepolia      │
 │  ProofCard     │                       │  chain ID: 421614      │
 │  TEEVisualizer │  /api/chaingpt        │                        │

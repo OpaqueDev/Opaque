@@ -302,8 +302,8 @@ export default function Home() {
               <div className="case-body">Professional trading desks use OPAQUE to share verified group performance to clients without exposing individual book sizes or strategy compositions.</div>
             </div>
             <div className="case-card inv">
-              <div className="case-tag">Use Case · Traffic Arbitrage</div>
-              <div className="case-title">Traffic Arbitrage &amp; On-Chain Proof</div>
+              <div className="case-tag">Use Case · Verifiable ROI</div>
+              <div className="case-title">Alpha Validation &amp; On-Chain Proof</div>
               <div className="case-body">Performance marketers running on-chain campaigns use OPAQUE&apos;s verified cards as cryptographic proof of ROI — no screenshots, no manipulation.</div>
             </div>
           </div>

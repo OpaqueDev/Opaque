@@ -92,7 +92,8 @@ In DeFi, every on-chain action is public. A great trader **cannot prove their al
 | **Live Activity Feed** | Live | Real-time shield/proof event stream |
 | **TEE Visualizer** | Live | Animated step-by-step confidential compute flow |
 | **Alpha Card Share** | Live | Download proof as PNG / copy for Twitter/Discord |
-| **Smart Contract** | Deployed | `OpaqueVault.sol` live on Arbitrum Sepolia |
+| **Smart-Blur Privacy UI** | Live | Sensitive balance figures obfuscated into ASCII states on the frontend before cryptographic sealing — privacy visible at the UI layer |
+| **Smart Contract** | Deployed | `OpaqueVault.sol` live on Arbitrum Sepolia — [verify on Arbiscan](https://sepolia.arbiscan.io/address/0xD4Ca145CB0340399be832a83E42da44bAE6E77aF) |
 | **Mobile Responsive** | Live | Full responsive layout with glassmorphism sidebar |
 | **RainbowKit Wallet** | Live | MetaMask + WalletConnect (QR) integration |
 
@@ -473,22 +474,31 @@ Q2 2026  v0.1 (CURRENT)
             ChainGPT AI risk audit + interactive chat
             TEE Visualizer animation
             Alpha Card (PNG download / social share)
+            Smart-Blur Privacy UI (ASCII obfuscation layer)
             RainbowKit wallet connection (MetaMask + WalletConnect)
-            Mobile responsive UI
+            Light/dark theme system + mobile responsive UI
 
 Q3 2026  v0.2
-            Real iExec SGX task dispatch (full on-chain TEE)
-            Stealth deposit addresses (mask shield() events)
+            Real iExec SGX task dispatch (full on-chain TEE, no simulation)
+            Stealth deposit addresses (mask shield() events from mempool)
             Mainnet deploy (Arbitrum One)
-            Alpha Badge NFT contract
-            Multi-token vault support
+            Alpha Badge NFT — minted on verified yield milestones (>50%, >100%)
+            Multi-token vault support (expanded ERC-20 registry)
+            Cross-chain bridge: Base + Optimism via Wormhole messaging
 
 Q4 2026  v1.0
-            ZK-SNARK proofs (replace SHA-256 with Groth16)
-            $OPQ governance token launch
-            DAO governance activation
-            Institutional API access tier
-            Cross-chain support (Base, Optimism, zkSync)
+            ZK-SNARK proofs — replace SHA-256 attestation with Groth16 circuits
+            Zero-knowledge yield validation: prove pnl range without revealing exact value
+            $OPQ governance token launch + staking for iExec Worker incentives
+            DAO governance activation — fee parameters, oracle rotation
+            Institutional API access tier — batch proof verification, private dashboards
+            Cross-chain expansion: zkSync Era, Polygon zkEVM
+
+2027     v2.0
+            Solana integration via Wormhole for cross-ecosystem alpha proofs
+            Mobile app (iOS/Android) with embedded TEE wallet
+            Privacy-preserving copy-trading — follow alpha without exposing strategy
+            On-chain reputation score — cumulative verified performance NFT
 ```
 
 ## Security
