@@ -50,11 +50,36 @@ export default function AnalyticsPage() {
   const [audit, setAudit] = useState<{
     score: string; trust_score: number; rug_risk: string; exploit: string; volatility: string;
   } | null>(null);
+  const [auditAge, setAuditAge] = useState<string>("");
 
   useEffect(() => {
+    const CACHE_KEY = "opaque_audit_cache";
+    const TTL = 15 * 60 * 1000; // 15 minutes
+
+    const cached = (() => {
+      try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (!raw) return null;
+        const { ts, data } = JSON.parse(raw);
+        if (Date.now() - ts < TTL) return { ts, data };
+        return null;
+      } catch { return null; }
+    })();
+
+    if (cached) {
+      setAudit(cached.data);
+      const mins = Math.floor((Date.now() - cached.ts) / 60000);
+      setAuditAge(mins === 0 ? "just now" : `${mins}m ago`);
+      return;
+    }
+
     fetch("/api/chaingpt", { method: "POST" })
       .then(res => res.json())
-      .then(data => setAudit(data))
+      .then(data => {
+        setAudit(data);
+        setAuditAge("just now");
+        localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+      })
       .catch(err => console.error(err));
   }, []);
 
@@ -143,6 +168,11 @@ export default function AnalyticsPage() {
                     <span style={{ color: val === "HIGH" ? "#ff4444" : val === "MED" ? "rgba(255,255,100,.8)" : "#4ade80" }}>{val}</span>
                   </div>
                 ))}
+                {auditAge && (
+                  <div style={{ fontSize: "9px", color: "rgba(255,255,255,.25)", fontFamily: "'Share Tech Mono',monospace", marginTop: "4px", textAlign: "right" }}>
+                    cached · {auditAge} · refreshes every 15m
+                  </div>
+                )}
               </div>
             </>
           )}

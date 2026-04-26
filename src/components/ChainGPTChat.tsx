@@ -10,6 +10,28 @@ const SUGGESTED = [
   "What is iExec Nox enclave security model?",
 ];
 
+const DAILY_LIMIT = 10;
+const STORAGE_KEY = "opaque_chat_usage";
+
+function getDailyUsage(): number {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return 0;
+    const { date, count } = JSON.parse(raw);
+    if (date !== new Date().toISOString().slice(0, 10)) return 0;
+    return count;
+  } catch {
+    return 0;
+  }
+}
+
+function incrementDailyUsage(): number {
+  const today = new Date().toISOString().slice(0, 10);
+  const next = getDailyUsage() + 1;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ date: today, count: next }));
+  return next;
+}
+
 interface Msg { role: "user" | "ai"; text: string; }
 
 export default function ChainGPTChat() {
@@ -18,20 +40,28 @@ export default function ChainGPTChat() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [msgCount, setMsgCount] = useState(0);
+  const [used, setUsed] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setUsed(getDailyUsage());
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [msgs]);
 
+  const remaining = DAILY_LIMIT - used;
+  const isLimitReached = remaining <= 0;
+
   const send = async (question?: string) => {
     const q = question ?? input.trim();
-    if (!q || loading) return;
+    if (!q || loading || isLimitReached) return;
     setInput("");
     setMsgs(prev => [...prev, { role: "user", text: q }]);
     setLoading(true);
-    setMsgCount(c => c + 1);
+    const newCount = incrementDailyUsage();
+    setUsed(newCount);
 
     try {
       const res = await fetch("/api/chaingpt", {
@@ -57,11 +87,12 @@ export default function ChainGPTChat() {
         <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#0000FF", animation: "pulse 2s infinite" }} />
         <div className="bc" style={{ fontSize: "15px", color: "var(--foreground)", textTransform: "uppercase", letterSpacing: "1px" }}>ChainGPT Risk AI</div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "8px" }}>
-          {msgCount > 0 && (
-            <div className="mono" style={{ fontSize: "9px", color: "var(--text-dim)" }}>
-              {msgCount} msg{msgCount !== 1 ? "s" : ""} sent
-            </div>
-          )}
+          <div className="mono" style={{
+            fontSize: "9px",
+            color: isLimitReached ? "#ff4444" : remaining <= 3 ? "#facc15" : "var(--text-dim)",
+          }}>
+            {isLimitReached ? "LIMIT REACHED" : `${remaining}/${DAILY_LIMIT} left today`}
+          </div>
           <div className="mono" style={{ fontSize: "9px", color: "#0000FF", background: "rgba(0,0,255,0.1)", padding: "3px 8px" }}>LIVE</div>
         </div>
       </div>
@@ -94,18 +125,23 @@ export default function ChainGPTChat() {
         ))}
         {loading && (
           <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#0000FF" }}>
-            <div className="mono" style={{ width: "22px", height: "22px", borderRadius: "50%", background: "#0000FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", marginRight: "0", color: "#fff" }}>
+            <div className="mono" style={{ width: "22px", height: "22px", borderRadius: "50%", background: "#0000FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", color: "#fff" }}>
               AI
             </div>
             <Loader2 size={12} className="animate-spin" style={{ marginLeft: "8px" }} />
             <span className="mono" style={{ fontSize: "11px" }}>ChainGPT is analyzing...</span>
           </div>
         )}
+        {isLimitReached && (
+          <div className="mono" style={{ textAlign: "center", padding: "16px", fontSize: "10px", color: "#ff4444", background: "rgba(255,68,68,0.05)", border: "1px solid rgba(255,68,68,0.2)", letterSpacing: "1px" }}>
+            DAILY LIMIT REACHED · Resets at midnight UTC
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
 
       {/* Suggestions — only show at start */}
-      {msgs.length <= 1 && !loading && (
+      {msgs.length <= 1 && !loading && !isLimitReached && (
         <div style={{ padding: "0 16px 8px", display: "flex", flexWrap: "wrap", gap: "6px" }}>
           {SUGGESTED.map((s, i) => (
             <button key={i} onClick={() => send(s)} className="mono" style={{ fontSize: "9px", padding: "4px 10px", background: "rgba(0,0,255,0.08)", border: "1px solid rgba(0,0,255,0.2)", color: "#0000FF", cursor: "pointer" }}>
@@ -121,16 +157,17 @@ export default function ChainGPTChat() {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === "Enter" && send()}
-          placeholder="Ask about DeFi risk, TEE, or portfolio..."
+          placeholder={isLimitReached ? "Daily limit reached. Come back tomorrow." : "Ask about DeFi risk, TEE, or portfolio..."}
+          disabled={isLimitReached}
           className="mono"
-          style={{ flex: 1, background: "var(--surface-alt)", border: "1px solid var(--border-soft)", color: "var(--foreground)", padding: "10px 12px", fontSize: "12px", outline: "none" }}
+          style={{ flex: 1, background: "var(--surface-alt)", border: "1px solid var(--border-soft)", color: isLimitReached ? "var(--text-faint)" : "var(--foreground)", padding: "10px 12px", fontSize: "12px", outline: "none", cursor: isLimitReached ? "not-allowed" : "text" }}
           maxLength={300}
         />
         <button
           onClick={() => send()}
-          disabled={loading || !input.trim()}
+          disabled={loading || !input.trim() || isLimitReached}
           className="mono"
-          style={{ background: !input.trim() || loading ? "var(--border)" : "#0000FF", color: "#fff", border: "none", padding: "10px 16px", fontSize: "11px", cursor: !input.trim() || loading ? "not-allowed" : "pointer", transition: "background 0.2s" }}
+          style={{ background: !input.trim() || loading || isLimitReached ? "var(--border)" : "#0000FF", color: "#fff", border: "none", padding: "10px 16px", fontSize: "11px", cursor: !input.trim() || loading || isLimitReached ? "not-allowed" : "pointer", transition: "background 0.2s" }}
         >
           SEND
         </button>

@@ -7,23 +7,45 @@ import { ProofCard } from "@/components/ProofCard";
 
 // ─── Cinematic loading steps ───────────────────────────────────────────────────
 const LOADING_STEPS = [
-  { msg: "Encrypting portfolio...", icon: "🔒" },
-  { msg: "Running confidential compute...", icon: "⬡" },
-  { msg: "Generating proof...", icon: "◈" }
+  { msg: "Encrypting portfolio...", icon: "▣" },
+  { msg: "Running confidential compute...", icon: "◈" },
+  { msg: "Generating proof...", icon: "◇" }
 ];
 
 // ─── How It Works panel ────────────────────────────────────────────────────────
+const HOW_IT_WORKS_ICONS = [
+  // Shield / lock — AES encryption
+  <svg key="shield" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    <line x1="12" y1="10" x2="12" y2="14"/>
+    <circle cx="12" cy="8.5" r="1"/>
+  </svg>,
+  // CPU / chip — SGX enclave
+  <svg key="cpu" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="7" y="7" width="10" height="10" rx="1"/>
+    <line x1="9" y1="7" x2="9" y2="4"/><line x1="12" y1="7" x2="12" y2="4"/><line x1="15" y1="7" x2="15" y2="4"/>
+    <line x1="9" y1="20" x2="9" y2="17"/><line x1="12" y1="20" x2="12" y2="17"/><line x1="15" y1="20" x2="15" y2="17"/>
+    <line x1="7" y1="9" x2="4" y2="9"/><line x1="7" y1="12" x2="4" y2="12"/><line x1="7" y1="15" x2="4" y2="15"/>
+    <line x1="20" y1="9" x2="17" y2="9"/><line x1="20" y1="12" x2="17" y2="12"/><line x1="20" y1="15" x2="17" y2="15"/>
+  </svg>,
+  // Check circle — result revealed
+  <svg key="check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="9"/>
+    <polyline points="8.5 12.5 11 15 15.5 10"/>
+  </svg>,
+];
+
 const HOW_IT_WORKS = [
   {
-    n: "01", icon: "🔒", title: "Data is Encrypted",
+    n: "01", title: "Data is Encrypted",
     body: "Inputs are sealed with AES-256 before leaving your device. Only the iExec Nox enclave holds the key.",
   },
   {
-    n: "02", icon: "⬡", title: "Compute Runs Privately",
+    n: "02", title: "Compute Runs Privately",
     body: "Computation happens inside an Intel SGX enclave. Zero visibility — not even the node operator can read your values.",
   },
   {
-    n: "03", icon: "✓", title: "Only Result is Revealed",
+    n: "03", title: "Only Result is Revealed",
     body: "The yield percentage exits the enclave. Your balance, positions, and wallet history stay completely hidden.",
   },
 ];
@@ -139,7 +161,7 @@ export default function ComputeVaultPage() {
               style={{ padding: "20px", flex: 1, position: "relative" }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
-                <span style={{ fontSize: "20px", color: i === 2 ? "#4ade80" : "var(--foreground)" }}>{step.icon}</span>
+                <span style={{ color: i === 2 ? "#4ade80" : "#0000FF", flexShrink: 0 }}>{HOW_IT_WORKS_ICONS[i]}</span>
                 <span className="bc" style={{ fontSize: "16px", color: "var(--foreground)", textTransform: "uppercase", letterSpacing: "1px" }}>{step.title}</span>
               </div>
               <div style={{ fontSize: "11px", color: "var(--text-muted)", lineHeight: 1.6, maxWidth: "240px" }}>{step.body}</div>

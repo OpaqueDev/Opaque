@@ -323,8 +323,8 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <div style={{ marginTop: "48px", borderTop: "1px solid var(--border-strong)", paddingTop: "40px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px", border: "1px solid var(--border-strong)" }}>
-          <div style={{ padding: "24px 28px", borderRight: "1px solid var(--border-strong)", background: "var(--surface)" }}>
+        <div className="tech-bottom-grid" style={{ marginTop: "48px", border: "1px solid var(--border-strong)" }}>
+          <div style={{ padding: "24px 28px", background: "var(--surface)" }}>
             <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: "18px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", color: "var(--foreground)" }}>iExec Nox SDK</div>
             <div style={{ fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.7 }}>Nox enables confidential wrapping of any ERC-20 token. Assets are computationally shielded within a Trusted Execution Environment (TEE).</div>
           </div>
