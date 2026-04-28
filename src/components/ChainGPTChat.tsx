@@ -1,6 +1,8 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { useAccount } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const SUGGESTED = [
   "Is ETH in a TEE safer than cold storage?",
@@ -35,6 +37,7 @@ function incrementDailyUsage(): number {
 interface Msg { role: "user" | "ai"; text: string; }
 
 export default function ChainGPTChat() {
+  const { isConnected } = useAccount();
   const [msgs, setMsgs] = useState<Msg[]>([
     { role: "ai", text: "I'm the ChainGPT Risk AI embedded in OPAQUE. Ask me about DeFi risks, smart contract security, TEE computing, or your portfolio strategy." }
   ]);
@@ -56,7 +59,7 @@ export default function ChainGPTChat() {
 
   const send = async (question?: string) => {
     const q = question ?? input.trim();
-    if (!q || loading || isLimitReached) return;
+    if (!q || loading || isLimitReached || !isConnected) return;
     setInput("");
     setMsgs(prev => [...prev, { role: "user", text: q }]);
     setLoading(true);
@@ -87,12 +90,14 @@ export default function ChainGPTChat() {
         <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#0000FF", animation: "pulse 2s infinite" }} />
         <div className="bc" style={{ fontSize: "15px", color: "var(--foreground)", textTransform: "uppercase", letterSpacing: "1px" }}>ChainGPT Risk AI</div>
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "8px" }}>
-          <div className="mono" style={{
-            fontSize: "9px",
-            color: isLimitReached ? "#ff4444" : remaining <= 3 ? "#facc15" : "var(--text-dim)",
-          }}>
-            {isLimitReached ? "LIMIT REACHED" : `${remaining}/${DAILY_LIMIT} left today`}
-          </div>
+          {isConnected && (
+            <div className="mono" style={{
+              fontSize: "9px",
+              color: isLimitReached ? "#ff4444" : remaining <= 3 ? "#facc15" : "var(--text-dim)",
+            }}>
+              {isLimitReached ? "LIMIT REACHED" : `${remaining}/${DAILY_LIMIT} left today`}
+            </div>
+          )}
           <div className="mono" style={{ fontSize: "9px", color: "#0000FF", background: "rgba(0,0,255,0.1)", padding: "3px 8px" }}>LIVE</div>
         </div>
       </div>
@@ -132,7 +137,7 @@ export default function ChainGPTChat() {
             <span className="mono" style={{ fontSize: "11px" }}>ChainGPT is analyzing...</span>
           </div>
         )}
-        {isLimitReached && (
+        {isConnected && isLimitReached && (
           <div className="mono" style={{ textAlign: "center", padding: "16px", fontSize: "10px", color: "#ff4444", background: "rgba(255,68,68,0.05)", border: "1px solid rgba(255,68,68,0.2)", letterSpacing: "1px" }}>
             DAILY LIMIT REACHED · Resets at midnight UTC
           </div>
@@ -140,8 +145,8 @@ export default function ChainGPTChat() {
         <div ref={bottomRef} />
       </div>
 
-      {/* Suggestions — only show at start */}
-      {msgs.length <= 1 && !loading && !isLimitReached && (
+      {/* Suggestions — only show when connected and at start */}
+      {isConnected && msgs.length <= 1 && !loading && !isLimitReached && (
         <div style={{ padding: "0 16px 8px", display: "flex", flexWrap: "wrap", gap: "6px" }}>
           {SUGGESTED.map((s, i) => (
             <button key={i} onClick={() => send(s)} className="mono" style={{ fontSize: "9px", padding: "4px 10px", background: "rgba(0,0,255,0.08)", border: "1px solid rgba(0,0,255,0.2)", color: "#0000FF", cursor: "pointer" }}>
@@ -151,27 +156,43 @@ export default function ChainGPTChat() {
         </div>
       )}
 
-      {/* Input */}
-      <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border)", display: "flex", gap: "8px" }}>
-        <input
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && send()}
-          placeholder={isLimitReached ? "Daily limit reached. Come back tomorrow." : "Ask about DeFi risk, TEE, or portfolio..."}
-          disabled={isLimitReached}
-          className="mono"
-          style={{ flex: 1, background: "var(--surface-alt)", border: "1px solid var(--border-soft)", color: isLimitReached ? "var(--text-faint)" : "var(--foreground)", padding: "10px 12px", fontSize: "12px", outline: "none", cursor: isLimitReached ? "not-allowed" : "text" }}
-          maxLength={300}
-        />
-        <button
-          onClick={() => send()}
-          disabled={loading || !input.trim() || isLimitReached}
-          className="mono"
-          style={{ background: !input.trim() || loading || isLimitReached ? "var(--border)" : "#0000FF", color: "#fff", border: "none", padding: "10px 16px", fontSize: "11px", cursor: !input.trim() || loading || isLimitReached ? "not-allowed" : "pointer", transition: "background 0.2s" }}
-        >
-          SEND
-        </button>
-      </div>
+      {/* Input or wallet gate */}
+      {!isConnected ? (
+        <div style={{ padding: "16px", borderTop: "1px solid var(--border)", display: "flex", flexDirection: "column", alignItems: "center", gap: "10px", background: "rgba(0,0,255,0.03)" }}>
+          <div className="mono" style={{ fontSize: "10px", color: "var(--text-muted)", letterSpacing: "1px", textAlign: "center" }}>
+            CONNECT WALLET TO USE CHAINGPT RISK AI
+          </div>
+          <ConnectButton.Custom>
+            {({ openConnectModal }) => (
+              <button onClick={openConnectModal} className="mono"
+                style={{ padding: "10px 24px", background: "#0000FF", color: "#fff", border: "none", fontSize: "11px", cursor: "pointer", letterSpacing: "1px" }}>
+                CONNECT WALLET →
+              </button>
+            )}
+          </ConnectButton.Custom>
+        </div>
+      ) : (
+        <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border)", display: "flex", gap: "8px" }}>
+          <input
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && send()}
+            placeholder={isLimitReached ? "Daily limit reached. Come back tomorrow." : "Ask about DeFi risk, TEE, or portfolio..."}
+            disabled={isLimitReached}
+            className="mono"
+            style={{ flex: 1, background: "var(--surface-alt)", border: "1px solid var(--border-soft)", color: isLimitReached ? "var(--text-faint)" : "var(--foreground)", padding: "10px 12px", fontSize: "12px", outline: "none", cursor: isLimitReached ? "not-allowed" : "text" }}
+            maxLength={300}
+          />
+          <button
+            onClick={() => send()}
+            disabled={loading || !input.trim() || isLimitReached}
+            className="mono"
+            style={{ background: !input.trim() || loading || isLimitReached ? "var(--border)" : "#0000FF", color: "#fff", border: "none", padding: "10px 16px", fontSize: "11px", cursor: !input.trim() || loading || isLimitReached ? "not-allowed" : "pointer", transition: "background 0.2s" }}
+          >
+            SEND
+          </button>
+        </div>
+      )}
     </div>
   );
 }

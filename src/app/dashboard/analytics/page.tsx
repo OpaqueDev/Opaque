@@ -181,9 +181,12 @@ export default function AnalyticsPage() {
         {/* Win Rate */}
         <div className="db db-stat">
           <div className="stat-l">Win Rate</div>
-          <div className="stat-n">73%</div>
+          <div className="stat-n" style={{ fontSize: "18px", color: "var(--border-soft)", marginTop: "6px" }}>—</div>
           <div style={{ height: "3px", background: "var(--border)", marginTop: "12px" }}>
-            <div style={{ height: "100%", width: "73%", background: "#0000FF" }} />
+            <div style={{ height: "100%", width: "0%", background: "#0000FF" }} />
+          </div>
+          <div className="mono" style={{ fontSize: "9px", color: "#0000FF", marginTop: "10px", letterSpacing: "1px" }}>
+            COMING SOON ON MAINNET
           </div>
         </div>
 
