@@ -83,6 +83,23 @@ export default function AnalyticsPage() {
       .catch(err => console.error(err));
   }, []);
 
+  // Win rate from proof history
+  const [winRate, setWinRate] = useState<number | null>(null);
+  const [totalProofs, setTotalProofs] = useState(0);
+  useEffect(() => {
+    if (!address) return;
+    try {
+      const history = JSON.parse(localStorage.getItem(`opaque_proofs_${address.toLowerCase()}`) || "[]");
+      setTotalProofs(history.length);
+      if (history.length > 0) {
+        const wins = history.filter((p: any) => p.pnl?.startsWith("+")).length;
+        setWinRate(Math.round((wins / history.length) * 100));
+      } else {
+        setWinRate(null);
+      }
+    } catch {}
+  }, [address]);
+
   const ethNum = ethBal ? parseFloat(formatUnits(ethBal.value, 18)) : 0;
   const simulatedPnL = isConnected && ethNum > 0
     ? ((ethNum - 0.01) / 0.01 * 100).toFixed(2)
@@ -181,9 +198,12 @@ export default function AnalyticsPage() {
         {/* Win Rate */}
         <div className="db db-stat">
           <div className="stat-l">Win Rate</div>
-          <div className="stat-n">73%</div>
+          <div className="stat-n" style={{ fontSize: "18px", color: "var(--border-soft)", marginTop: "6px" }}>—</div>
           <div style={{ height: "3px", background: "var(--border)", marginTop: "12px" }}>
-            <div style={{ height: "100%", width: "73%", background: "#0000FF" }} />
+            <div style={{ height: "100%", width: "0%", background: "#0000FF" }} />
+          </div>
+          <div className="mono" style={{ fontSize: "9px", color: "#0000FF", marginTop: "10px", letterSpacing: "1px" }}>
+            COMING SOON ON MAINNET
           </div>
         </div>
 

@@ -1,36 +1,30 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
+import { fetchAndComputePnL } from "@/lib/enclave-pnl";
 
 export async function POST(req: Request) {
   try {
     const { initial, final, wallet } = await req.json();
-    
-    if (!initial || !final || !wallet) {
-      return NextResponse.json({ error: "Missing initial amount, final amount, or wallet" }, { status: 400 });
+
+    if (!wallet) {
+      return NextResponse.json({ error: "Missing wallet" }, { status: 400 });
     }
 
-    // Exact evaluation requested by the user
-    const current = final;
-    
-    // Compute exact mathematical PnL
-    const pnl = ((current - initial) / initial) * 100;
-    
-    // Generate Deterministic Proof
-    const crypto = await import('crypto');
-    const proof = crypto.createHash('sha256').update(`${wallet}${initial}${pnl}`).digest('hex');
-
-    // Generate encrypted balance
-    const chars = ['█', '▓', '▒', '░', '◉'];
-    let encryptedBalance = '';
-    for (let i = 0; i < 8; i++) {
-      encryptedBalance += chars[Math.floor(Math.random() * chars.length)];
-    }
+    // Run inside TEE boundary — only result exits, no raw balances
+    const result = await fetchAndComputePnL(
+      wallet as `0x${string}`,
+      initial !== undefined ? Number(initial) : undefined,
+      final   !== undefined ? Number(final)   : undefined
+    );
 
     return NextResponse.json({
-      pnl: (pnl > 0 ? '+' : '') + pnl.toFixed(2) + '%',
-      proof,
-      encryptedBalance
+      pnl:                    result.pnl_display,
+      proof:                  result.proof_hash,
+      pnl_percentage:         result.pnl_percentage,
+      verification_timestamp: result.verification_timestamp,
+      deposits_analysed:      result.deposits_analysed,
     });
-  } catch {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  } catch (e: any) {
+    console.error("Compute error:", e);
+    return NextResponse.json({ error: "Computation failed" }, { status: 500 });
   }
 }
