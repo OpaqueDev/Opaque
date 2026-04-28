@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
-
-const ChainGPTChat = lazy(() => import("@/components/ChainGPTChat"));
 
 export default function Home() {
   const [navOpen, setNavOpen] = useState(false);
@@ -29,7 +27,6 @@ export default function Home() {
           <li><a href="#why">Why Us</a></li>
           <li><a href="#services">Services</a></li>
           <li><a href="#tech">Technology</a></li>
-          <li><a href="#ai-risk">AI Risk</a></li>
           <li><Link href="/docs" style={{ color: "inherit", textDecoration: "none" }}>Docs</Link></li>
         </ul>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -49,7 +46,6 @@ export default function Home() {
         <a href="#why" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "var(--foreground)", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Why Us</a>
         <a href="#services" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "var(--foreground)", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Services</a>
         <a href="#tech" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "var(--foreground)", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Technology</a>
-        <a href="#ai-risk" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "var(--foreground)", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>AI Risk</a>
         <Link href="/docs" onClick={() => setNavOpen(false)} style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 900, fontSize: "36px", color: "#0000FF", textDecoration: "none", textTransform: "uppercase", letterSpacing: "2px" }}>Docs</Link>
       </div>
 
@@ -335,30 +331,6 @@ export default function Home() {
           <div style={{ padding: "24px 28px", background: "var(--surface)" }}>
             <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 800, fontSize: "18px", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "8px", color: "var(--foreground)" }}>ChainGPT Audit API</div>
             <div style={{ fontSize: "13px", color: "var(--text-muted)", lineHeight: 1.7 }}>Real-time AI scoring of portfolio risk across 50+ smart contract vulnerability vectors, continuously updated on every block.</div>
-          </div>
-        </div>
-      </section>
-
-      {/* CHAINGPT RISK AI — no wallet required */}
-      <section id="ai-risk" style={{ padding: "80px 5%", background: "var(--surface)" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "40px" }}>
-            <div className="section-label">AI Risk Engine</div>
-            <h2 className="bc" style={{ fontSize: "clamp(32px, 5vw, 52px)", textTransform: "uppercase", lineHeight: 1.1, letterSpacing: "-1px", color: "var(--foreground)" }}>
-              Ask ChainGPT<br/>Risk AI
-            </h2>
-            <p style={{ fontSize: "14px", color: "var(--text-muted)", maxWidth: "480px", lineHeight: 1.7, marginTop: "8px" }}>
-              Real-time DeFi risk analysis powered by ChainGPT. Ask anything about smart contract safety, TEE security, or portfolio risk — no wallet required.
-            </p>
-          </div>
-          <div style={{ maxWidth: "680px" }}>
-            <Suspense fallback={
-              <div className="mono" style={{ padding: "32px", background: "var(--sidebar-bg)", border: "1px solid var(--border)", color: "var(--border-soft)", fontSize: "11px", letterSpacing: "1px" }}>
-                LOADING AI...
-              </div>
-            }>
-              <ChainGPTChat />
-            </Suspense>
           </div>
         </div>
       </section>
