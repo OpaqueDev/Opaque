@@ -165,35 +165,30 @@ export function ProofCard({ pnl, proof, wallet, onDownload, isCapturing = false 
           <div className="mono" style={{ fontSize: "10px", color: "#555", textTransform: "uppercase", letterSpacing: "3px", marginBottom: "12px" }}>
             Verified Net Yield
           </div>
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
+          <div
             className="bc"
-            style={isCapturing ? {
+            style={{
               fontSize: "clamp(72px, 14vw, 108px)",
               lineHeight: 0.85,
               letterSpacing: "-3px",
-              color: mode === 'private' ? "transparent" : (isProfit ? "#00ccff" : "#ff4444"),
               userSelect: "none",
-            } : {
-              fontSize: "clamp(72px, 14vw, 108px)",
-              lineHeight: 0.85,
-              letterSpacing: "-3px",
-              background: isProfit && mode === 'public'
-                ? "linear-gradient(135deg, #fff 30%, #00ffff 70%)"
-                : (mode === 'private' ? "linear-gradient(135deg, #888 30%, #444 70%)" : "linear-gradient(135deg, #fff 30%, #ff4444 70%)"),
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              filter: isProfit && mode === 'public'
-                ? "drop-shadow(0 0 20px rgba(0,100,255,0.8)) drop-shadow(0 0 40px rgba(0,0,255,0.4))"
-                : (mode === 'private' ? "none" : "drop-shadow(0 0 20px rgba(255,60,60,0.8))"),
-              userSelect: "none",
+              color: isCapturing && mode === 'private'
+                ? "transparent"
+                : mode === 'private'
+                  ? "#555"
+                  : isProfit
+                    ? "#00ccff"
+                    : "#ff4444",
+              textShadow: isCapturing || mode === 'private'
+                ? "none"
+                : isProfit
+                  ? "0 0 30px rgba(0,200,255,0.7), 0 0 60px rgba(0,100,255,0.4)"
+                  : "0 0 30px rgba(255,60,60,0.7), 0 0 60px rgba(255,0,0,0.3)",
+              transition: "color 0.2s ease, text-shadow 0.2s ease",
             }}
           >
             {mode === 'public' ? pnl : encPnl}
-          </motion.div>
+          </div>
 
           {/* Private capture overlay — replaces scramble with clean confidential badge */}
           {isCapturing && mode === 'private' && (
