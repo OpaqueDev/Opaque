@@ -48,3 +48,7 @@ CLAUDE.md
 extract.js
 feedback.md
 OPAQUE_FULLPAGE.html
+
+# Hardhat build outputs (auto-generated)
+/artifacts/
+/cache/
