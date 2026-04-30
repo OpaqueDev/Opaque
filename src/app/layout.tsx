@@ -37,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${barlowCondensed.variable} ${inter.variable} ${shareTechMono.variable}`}>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`${barlowCondensed.variable} ${inter.variable} ${shareTechMono.variable}`}>
       <body>
         <ThemeProvider attribute="data-theme" defaultTheme="dark" disableTransitionOnChange>
           <Web3Provider>{children}</Web3Provider>
