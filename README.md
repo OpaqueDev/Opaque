@@ -44,6 +44,8 @@ OPAQUE is a **Proof of Alpha Protocol** - a full-stack Web3 dApp that lets DeFi 
 
 Built on **iExec Nox Trusted Execution Environments (TEE)**, portfolio computations run inside Intel SGX hardware enclaves - completely sealed from the node operator, the network, and even the OPAQUE team. The output is a **deterministic SHA-256 Alpha Proof** - verifiable by anyone, reversible by no one.
 
+Asset shielding is powered by **iExec Nox ERC-7984** (`WrappedConfidentialUSDC`) — a confidential token standard where balances are encrypted on-chain using homomorphic encryption. Your shielded balance is never exposed, even to the smart contract itself.
+
 ## The Problem
 
 In DeFi, every on-chain action is public. A great trader **cannot prove their alpha** without doxxing their entire portfolio:
@@ -69,31 +71,36 @@ In DeFi, every on-chain action is public. A great trader **cannot prove their al
 ## How It Works
 
 ```
-1. SHIELD      Deposit ERC-20 tokens into OpaqueVault.sol (on-chain)
-2. COMPUTE     iExec Nox enclave calculates net yield (off-chain, sealed)
-3. ATTEST      SHA-256 Alpha Proof is generated: sha256(wallet + initial + pnl)
+1. SHIELD      Wrap Circle USDC into wcUSDC via WrappedConfidentialUSDC.wrap()
+               Your balance is encrypted on-chain (ERC-7984 confidential token)
+2. COMPUTE     iExec Nox enclave reads on-chain deposit events, calculates net yield
+3. ATTEST      SHA-256 Alpha Proof is generated: sha256(wallet + pnl + timestamp)
 4. SHARE       Proof is distributed - Twitter, Discord, DAOs, anywhere
-5. VERIFY      Anyone recomputes sha256(wallet + initial + pnl) and checks match
+5. VERIFY      Anyone recomputes sha256(wallet + pnl + timestamp) and checks match
+6. UNSHIELD    Encrypt unwrap amount → unwrap() → TEE decrypts → finalizeUnwrap()
 ```
 
 **What is revealed:** Your yield percentage (you choose to share this)  
-**What stays hidden:** Your actual balance, holdings, and wallet strategy
+**What stays hidden:** Your actual balance, holdings, wallet strategy, and shielded amount
 
 ## Feature Matrix
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| **Asset Shielding** | Live | Deposit ERC-20s into `OpaqueVault.sol` on Arbitrum Sepolia |
+| **Asset Shielding (ERC-7984)** | Live | Wrap USDC → wcUSDC via `WrappedConfidentialUSDC.wrap()` on Arbitrum Sepolia |
+| **Confidential Balances** | Live | Balance stored as encrypted `euint256` — hidden from everyone including the contract |
+| **TEE Unwrap Flow** | Live | `encryptInput → unwrap → publicDecrypt → finalizeUnwrap` via iExec Nox |
 | **TEE Confidential Compute** | Live | iExec Nox SGX enclave integration with real SDK |
-| **Alpha Proof (SHA-256)** | Live | `sha256(wallet + initial + pnl)` - deterministic, verifiable |
+| **Alpha Proof (SHA-256)** | Live | `sha256(wallet + pnl + timestamp)` - deterministic, verifiable |
+| **Auto-Compute on Connect** | Live | Proof auto-generated from on-chain deposit events on wallet connect |
 | **Proof Verification** | Live | Anyone can independently recompute and verify the proof |
 | **ChainGPT AI Risk Audit** | Live | Real-time portfolio risk scoring via ChainGPT API |
-| **ChainGPT AI Chat** | Live | Interactive DeFi risk assistant powered by ChainGPT |
+| **ChainGPT AI Chat** | Live | Interactive DeFi risk assistant (wallet connection required) |
 | **Live Activity Feed** | Live | Real-time shield/proof event stream |
 | **TEE Visualizer** | Live | Animated step-by-step confidential compute flow |
 | **Alpha Card Share** | Live | Download proof as PNG / copy for Twitter/Discord |
-| **Smart-Blur Privacy UI** | Live | Sensitive balance figures obfuscated into ASCII states on the frontend before cryptographic sealing — privacy visible at the UI layer |
-| **Smart Contract** | Deployed | `OpaqueVault.sol` live on Arbitrum Sepolia — [verify on Arbiscan](https://sepolia.arbiscan.io/address/0xD4Ca145CB0340399be832a83E42da44bAE6E77aF) |
+| **Smart-Blur Privacy UI** | Live | Shielded balance shown as `████ ████` — reveal on demand via TEE decrypt |
+| **Smart Contract** | Deployed | `WrappedConfidentialUSDC` live on Arbitrum Sepolia — [verify on Arbiscan](https://sepolia.arbiscan.io/address/0xF8d68DA9C2e95e4E636Bd3737534d59Aad66703F) |
 | **Mobile Responsive** | Live | Full responsive layout with glassmorphism sidebar |
 | **RainbowKit Wallet** | Live | MetaMask + WalletConnect (QR) integration |
 
@@ -104,34 +111,69 @@ In DeFi, every on-chain action is public. A great trader **cannot prove their al
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         OPAQUE STACK                                │
-│ ├────────────────────┬─────────────────────┬──────────────────────────┤
+├────────────────────┬─────────────────────┬──────────────────────────┤
 │    PRESENTATION    │       BACKEND        │     BLOCKCHAIN LAYER     │
 │                    │                      │                          │
-│  Next.js 16        │  /api/compute        │  OpaqueVault.sol         │
-│  RainbowKit        │  SHA-256 attestation │  Arbitrum Sepolia        │
-│  wagmi v2          │                      │  Chain ID: 421614        │
-│  ProofCard.tsx     │  /api/chaingpt       │                          │
-│  TEEVisualizer.tsx │  Risk AI routing     │  iExec Task Registry     │
-│  ChainGPTChat.tsx  │                      │  TEE Worker Pool         │
-│  LiveActivityFeed  │                      │                          │
+│  Next.js 16        │  /api/compute        │  WrappedConfidentialUSDC │
+│  RainbowKit        │  SHA-256 attestation │  ERC-7984 (iExec Nox)   │
+│  wagmi v2          │                      │  Arbitrum Sepolia        │
+│  ProofCard.tsx     │  /api/chaingpt       │  Chain ID: 421614        │
+│  TEEVisualizer.tsx │  Risk AI routing     │                          │
+│  ChainGPTChat.tsx  │                      │  iExec Task Registry     │
+│  ShieldPage        │                      │  TEE Worker Pool         │
 └────────────────────┴─────────────────────┴──────────────────────────┘
 ```
 
-### Data Flow
+### Data Flow — Wrap (Shield)
 
 ```
-User Input (wallet, initial_value, final_value)
+User inputs USDC amount
         │
         ▼
-  Next.js API Route (/api/compute)
+  USDC.approve(WrappedConfidentialUSDC, amount)
         │
-        ├──▶  iExec Nox TEE Layer (src/lib/iexec.ts)
-        │         └── SGX Enclave: pnl = (final - initial) / initial × 100
+        ▼
+  WrappedConfidentialUSDC.wrap(userAddress, amount)
         │
-        ├──▶  SHA-256 Hasher
-        │         └── proof = sha256(wallet + initial + pnl)
+        └──▶  Balance stored as encrypted euint256 on-chain
+              UI shows "████ ████" — click REVEAL to decrypt via TEE
+```
+
+### Data Flow — Unwrap (Unshield)
+
+```
+User inputs wcUSDC amount
         │
-        └──▶  Response { pnl, proofId, timestamp }
+        ▼
+  @iexec-nox/handle: encryptInput(amount) → { handle, handleProof }
+        │
+        ▼
+  WrappedConfidentialUSDC.unwrap(from, to, handle, handleProof)
+        │  ← Emits UnwrapRequested(unwrapRequestId)
+        ▼
+  @iexec-nox/handle: publicDecrypt(unwrapRequestId) → { decryptionProof }
+        │
+        ▼
+  WrappedConfidentialUSDC.finalizeUnwrap(unwrapRequestId, decryptionProof)
+        │
+        └──▶  Circle USDC returned to wallet
+```
+
+### Data Flow — Alpha Proof
+
+```
+Wallet connects
+        │
+        ▼
+  /api/compute  (wallet address only — no manual input needed)
+        │
+        ├──▶  Read on-chain deposit events for wallet
+        │
+        ├──▶  iExec Nox TEE Layer: compute net yield inside SGX enclave
+        │
+        ├──▶  SHA-256 Hasher: proof = sha256(wallet + pnl + timestamp)
+        │
+        └──▶  Response { pnl, proof_hash, pnl_percentage, deposits_analysed }
                     │
                     ▼
               ProofCard Component
@@ -142,57 +184,69 @@ User Input (wallet, initial_value, final_value)
 
 ## Smart Contract
 
-**`OpaqueVault.sol`** - Deployed on Arbitrum Sepolia
+**`WrappedConfidentialUSDC`** — iExec Nox ERC-7984 confidential token wrapper, deployed on Arbitrum Sepolia
 
 ```
-Contract Address: 0xD4Ca145CB0340399be832a83E42da44bAE6E77aF
+Contract Address: 0xF8d68DA9C2e95e4E636Bd3737534d59Aad66703F
+Underlying USDC:  0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d  (Circle testnet USDC)
 Network:          Arbitrum Sepolia (Chain ID: 421614)
-Explorer:         https://sepolia.arbiscan.io/address/0xD4Ca145CB0340399be832a83E42da44bAE6E77aF
+Explorer:         https://sepolia.arbiscan.io/address/0xF8d68DA9C2e95e4E636Bd3737534d59Aad66703F
+Standard:         ERC-7984 (iExec Nox confidential token)
 ```
 
 ### ABI Summary
 
 ```solidity
-// Shield assets - permissionless, anyone can deposit
-function shield(
-    address token,           // ERC-20 token address
-    uint256 amount,          // Token amount (in wei)
-    bytes calldata payload   // Encrypted routing payload for iExec Worker
+// Wrap ERC-20 USDC → confidential wcUSDC
+// Returns encrypted balance handle (euint256 encoded as bytes32)
+function wrap(address to, uint256 amount) external returns (bytes32);
+
+// Initiate unwrap — encrypted amount burned, TEE decryption requested
+// encryptedAmount: externalEuint256 (bytes32 from @iexec-nox/handle encryptInput)
+// inputProof: proof bytes from encryptInput
+// Returns unwrapRequestId (bytes32) — needed for finalizeUnwrap
+function unwrap(
+    address from,
+    address to,
+    bytes32 encryptedAmount,
+    bytes calldata inputProof
+) external returns (bytes32 unwrapRequestId);
+
+// Finalize unwrap after TEE decryption — releases Circle USDC to recipient
+function finalizeUnwrap(
+    bytes32 unwrapRequestId,
+    bytes calldata decryptedAmountAndProof
 ) external;
 
-// Unshield assets - only callable by TEE Oracle (iExec Worker Pool)
-function unshield(
-    address recipient,       // Destination wallet
-    address token,           // ERC-20 token address
-    uint256 amount,          // Token amount
-    bytes32 proofId          // SHA-256 Alpha Proof from TEE
-) external onlyTEE;
+// Read encrypted balance (euint256 as bytes32) — use @iexec-nox/handle to decrypt
+function confidentialBalanceOf(address account) external view returns (bytes32);
 
 // Events
-event AssetShielded(address indexed sender, address indexed token, uint256 amount, bytes encryptedPayload);
-event AssetUnshielded(address indexed recipient, address indexed token, uint256 amount, bytes32 proofId);
+event UnwrapRequested(address indexed receiver, bytes32 amount);
+event UnwrapFinalized(address indexed receiver, bytes32 encryptedAmount, uint256 plaintextAmount);
 ```
 
 ### Key Design Decisions
 
 | Decision | Rationale |
 |----------|-----------|
-| `shield()` is permissionless | Anyone can deposit - no whitelist risk |
-| `unshield()` is `onlyTEE` | Only verified SGX enclave can authorize withdrawals |
-| `encryptedPayload` in `shield()` | Hides routing intent from mempool observers |
-| `setTEEOracle()` available | Multisig can rotate oracle without vault redeployment |
+| ERC-7984 standard | Balances encrypted at the homomorphic layer — even the contract cannot read them |
+| `wrap()` is permissionless | Anyone can deposit — no whitelist risk |
+| Two-step unwrap | TEE must decrypt before USDC is released — prevents unauthorized withdrawals |
+| `publicDecrypt` on unwrapRequestId | Allows anyone (including the frontend) to run decryption without wallet signature |
+| `euint256` encoded as `bytes32` in ABI | Opaque 32-byte handle — only the iExec Nox TEE can interpret the value |
 
 ## Cryptographic Proof System
 
 ### Alpha Proof Construction
 
 ```typescript
-// src/app/api/compute/route.ts
+// src/lib/enclave-pnl.ts
 import crypto from 'crypto';
 
 const proof = crypto
   .createHash('sha256')
-  .update(`${walletAddress}${initialValue}${pnlValue}`)
+  .update(`${walletAddress}${pnlValue}${timestamp}`)
   .digest('hex');
 
 // Result: "0xA3F9...9C21" (truncated for display)
@@ -210,10 +264,10 @@ Anyone can verify an Alpha Proof in 3 steps:
 
 ```bash
 # Step 1: Get public inputs from prover
-# wallet = "0xABC...", initial = "10000", pnl = "143.5"
+# wallet = "0xABC...", pnl = "143.5", timestamp = "1714000000000"
 
 # Step 2: Recompute hash
-echo -n "0xABC...100000143.5" | sha256sum
+echo -n "0xABC...143.51714000000000" | sha256sum
 
 # Step 3: Compare with published Proof ID
 # Match = authentic  |  No match = fraudulent
@@ -236,6 +290,7 @@ iExec Nox is a confidential computing platform that executes code inside **Intel
 - Memory is encrypted at the hardware level
 - Not even the node operator can see computation state
 - All outputs carry a hardware-backed cryptographic attestation
+- Confidential token balances (`euint256`) can only be decrypted inside the enclave
 
 ### OPAQUE's Integration Model
 
@@ -243,17 +298,21 @@ iExec Nox is a confidential computing platform that executes code inside **Intel
 Client Request
       │
       ▼
+@iexec-nox/handle SDK  ←  encryptInput() for wrap amounts
+      │                ←  decrypt() for reading own balance
+      │                ←  publicDecrypt() for finalizing unwrap
+      ▼
 iExec Task Registry (on-chain)
       │
       ▼
 Nox SGX Worker Pool
       │  ← Sealed computation happens here
-      │  ← Not visible to anyone outside the enclave
+      │  ← Encrypted euint256 balances manipulated inside enclave
       ▼
-Attested Output (pnl + proofId)
+Attested Output (decrypted amount + proof)
       │
       ▼
-OpaqueVault.unshield() ← Only callable with valid TEE attestation
+WrappedConfidentialUSDC.finalizeUnwrap()  ← Releases USDC after TEE attestation
 ```
 
 ### TEE vs Traditional Compute
@@ -264,8 +323,9 @@ OpaqueVault.unshield() ← Only callable with valid TEE attestation
 | Output integrity | Trust-based | Hardware-attested |
 | Operator can manipulate | Yes | No |
 | Audit trail | Off-chain | On-chain + attested |
+| Balance visibility | Public | Encrypted (euint256) |
 
-> **Current status:** OPAQUE v0.1 implements the full iExec SDK integration layer with TEE simulation mode. Real SGX enclave dispatch is the primary target for v0.2.
+> **Current status:** OPAQUE v0.1 implements the full iExec Nox SDK integration with `WrappedConfidentialUSDC` (ERC-7984) on Arbitrum Sepolia testnet.
 
 ## AI Risk Layer (ChainGPT)
 
@@ -288,11 +348,11 @@ On dashboard load, OPAQUE calls ChainGPT server-side for a structured risk asses
 
 ### Interactive AI Chat
 
-Users can ask contextual DeFi questions via the embedded chat UI:
+Users can ask contextual DeFi questions via the embedded chat UI. **Wallet connection is required** to use the chat.
 
 ```
 Endpoint: POST /api/chaingpt
-Body:     { "question": "Is ETH in a TEE safer than cold storage?" }
+Body:     { "question": "Is wcUSDC in a TEE safer than cold storage?" }
 ```
 
 **Suggested starter questions (built-in):**
@@ -305,15 +365,15 @@ Body:     { "question": "Is ETH in a TEE safer than cold storage?" }
 
 | Layer | Technology | Version |
 |-------|-----------|---------|
-| **Frontend** | Next.js | 16.2.4 |
+| **Frontend** | Next.js | 16.x |
 | **Wallet** | RainbowKit + wagmi | 2.x |
 | **Chain** | viem | 2.x |
 | **Query** | TanStack React Query | 5.x |
 | **Animations** | Framer Motion | 12.x |
 | **AI** | ChainGPT API | REST |
-| **Compute** | iExec SDK | 8.x |
+| **Confidential Token** | iExec Nox ERC-7984 | `@iexec-nox/handle` |
 | **Network** | Arbitrum Sepolia | Chain 421614 |
-| **Smart Contract** | Solidity + OpenZeppelin | 5.x |
+| **Smart Contract** | Solidity + iExec Nox | 0.8.28 |
 | **Share** | html2canvas | 1.4 |
 | **Hosting** | Vercel | Edge |
 
@@ -321,17 +381,19 @@ Body:     { "question": "Is ETH in a TEE safer than cold storage?" }
 
 ### Prerequisites
 
-- Node.js 18+
-- npm or yarn
+- Node.js 20+
+- npm
 - MetaMask or any Web3 wallet
 - ChainGPT API Key ([get one here](https://app.chaingpt.org/apidashboard))
+- Arbitrum Sepolia testnet ETH ([faucet](https://faucet.triangleplatform.com/arbitrum/sepolia))
+- Circle testnet USDC ([faucet](https://faucet.circle.com))
 
 ### Installation
 
 ```bash
 # Clone the repo
 git clone https://github.com/OpaqueDev/Opaque.git
-cd opque
+cd Opaque
 
 # Install dependencies (legacy-peer-deps required for RainbowKit compatibility)
 npm install --legacy-peer-deps
@@ -355,10 +417,13 @@ Create `.env.local` in the root directory:
 # Get yours at: https://app.chaingpt.org/apidashboard
 CHAINGPT_API_KEY="your-chaingpt-api-key"
 
-# OpaqueVault contract address (Arbitrum Sepolia - already deployed)
-NEXT_PUBLIC_VAULT_ADDRESS="0xD4Ca145CB0340399be832a83E42da44bAE6E77aF"
+# Circle USDC on Arbitrum Sepolia (already deployed by Circle)
+NEXT_PUBLIC_USDC_ADDRESS="0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d"
 
-# WalletConnect Project ID (required for QR code wallet connection)
+# WrappedConfidentialUSDC — iExec Nox ERC-7984 (already deployed)
+NEXT_PUBLIC_WRAPPED_USDC_ADDRESS="0xF8d68DA9C2e95e4E636Bd3737534d59Aad66703F"
+
+# WalletConnect Project ID (recommended for QR code wallet connection)
 # Get yours at: https://cloud.walletconnect.com
 NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID="your-walletconnect-project-id"
 ```
@@ -366,7 +431,8 @@ NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID="your-walletconnect-project-id"
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `CHAINGPT_API_KEY` | Yes | Enables AI risk audit + chat |
-| `NEXT_PUBLIC_VAULT_ADDRESS` | Yes | Smart contract address |
+| `NEXT_PUBLIC_USDC_ADDRESS` | Yes | Circle USDC contract (Arbitrum Sepolia) |
+| `NEXT_PUBLIC_WRAPPED_USDC_ADDRESS` | Yes | WrappedConfidentialUSDC ERC-7984 contract |
 | `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | Recommended | Without this, only MetaMask (injected) works |
 
 > **Security note:** Never commit `.env.local` to git. The `.gitignore` already excludes it.
@@ -384,7 +450,7 @@ vercel --prod
 ```
 
 Then set environment variables in Vercel Dashboard:
-- `Settings` → `Environment Variables` → Add all three keys above
+- `Settings` → `Environment Variables` → Add all keys above
 
 ### Build Locally
 
@@ -396,7 +462,7 @@ npm start
 ### Docker (optional)
 
 ```dockerfile
-FROM node:18-alpine
+FROM node:20-alpine
 WORKDIR /app
 COPY . .
 RUN npm install --legacy-peer-deps
@@ -409,26 +475,27 @@ CMD ["npm", "start"]
 
 ### `POST /api/compute`
 
-Generate an Alpha Proof from portfolio data.
+Generate an Alpha Proof from on-chain deposit history. Only requires wallet address — values are read automatically from chain.
 
 **Request:**
 ```json
 {
-  "wallet": "0xYourWalletAddress",
-  "initialValue": 10000,
-  "finalValue": 14350
+  "wallet": "0xYourWalletAddress"
 }
 ```
 
 **Response:**
 ```json
 {
-  "pnl": 43.5,
-  "proofId": "0xA3F9...9C21",
-  "timestamp": 1714000000000,
-  "formula": "sha256(wallet + initial + pnl)"
+  "pnl": "+43.50%",
+  "proof": "a3f9...9c21",
+  "pnl_percentage": 43.5,
+  "verification_timestamp": 1714000000000,
+  "deposits_analysed": 3
 }
 ```
+
+> Optional: pass `initial` and `final` numeric values for manual override mode.
 
 ### `POST /api/chaingpt`
 
@@ -436,7 +503,7 @@ Generate an Alpha Proof from portfolio data.
 
 **Request:**
 ```json
-{ "question": "Is ETH safer in a TEE than cold storage?" }
+{ "question": "Is wcUSDC in a TEE safer than cold storage?" }
 ```
 
 **Response:**
@@ -468,19 +535,21 @@ Generate an Alpha Proof from portfolio data.
 
 ```
 Q2 2026  v0.1 (CURRENT)
-            OpaqueVault.sol deployed on Arbitrum Sepolia
-            SHA-256 Alpha Proof generation + verification
-            iExec Nox SDK integration layer (simulation mode)
-            ChainGPT AI risk audit + interactive chat
+            WrappedConfidentialUSDC (ERC-7984) deployed on Arbitrum Sepolia
+            Confidential wrap/unwrap flow via iExec Nox TEE
+            SHA-256 Alpha Proof generation from on-chain deposit events
+            Auto-compute proof on wallet connect
+            iExec Nox SDK integration (@iexec-nox/handle)
+            ChainGPT AI risk audit + interactive chat (wallet-gated)
             TEE Visualizer animation
             Alpha Card (PNG download / social share)
-            Smart-Blur Privacy UI (ASCII obfuscation layer)
+            Smart-Blur Privacy UI (████ ████ reveal on demand)
             RainbowKit wallet connection (MetaMask + WalletConnect)
             Light/dark theme system + mobile responsive UI
 
 Q3 2026  v0.2
             Real iExec SGX task dispatch (full on-chain TEE, no simulation)
-            Stealth deposit addresses (mask shield() events from mempool)
+            Stealth deposit addresses (mask wrap() events from mempool)
             Mainnet deploy (Arbitrum One)
             Alpha Badge NFT — minted on verified yield milestones (>50%, >100%)
             Multi-token vault support (expanded ERC-20 registry)
@@ -508,16 +577,16 @@ Q4 2026  v1.0
 | Threat | Mitigation |
 |--------|-----------|
 | API key exposure | Stored server-side only (`.env.local` / Vercel secrets) |
-| Vault drain attack | `unshield()` gated to `teeOracle` only |
-| Fake proof claim | SHA-256 is publicly reproducible - forgery is instantly detectable |
-| MEV / front-running | `encryptedPayload` masks shield intent from mempool |
-| Oracle compromise | `setTEEOracle()` is `onlyOwner` (multisig in production) |
+| Balance exposure | `euint256` encryption — balance never leaves TEE in plaintext |
+| Unauthorized unwrap | Two-step: TEE must decrypt + attest before USDC released |
+| Fake proof claim | SHA-256 is publicly reproducible — forgery is instantly detectable |
+| MEV / front-running | Encrypted amount handle masks unwrap intent from mempool |
 
 ### Current Limitations (v0.1)
 
 - Uses **SHA-256 attestation**, not full ZK-SNARK. Full ZK upgrade planned for v1.0.
-- `shield()` event reveals depositor address and token amount (stealth addresses in v0.2).
-- iExec TEE is in **simulation mode** for this hackathon build. Real SGX dispatch is v0.2.
+- `wrap()` event reveals depositor address and token amount (stealth addresses in v0.2).
+- iExec TEE unwrap flow relies on testnet oracle — production SGX dispatch is v0.2.
 
 ### Reporting Issues
 
@@ -539,7 +608,7 @@ git push origin feature/your-feature-name
 
 **Contribution areas we want help with:**
 - ZK-SNARK circuit implementation (Circom / Noir)
-- Real iExec task dispatch integration
+- Real iExec SGX task dispatch integration
 - Historical PnL tracking & analytics
 - Multi-language support
 
