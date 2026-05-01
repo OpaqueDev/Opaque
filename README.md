@@ -83,6 +83,17 @@ In DeFi, every on-chain action is public. A great trader **cannot prove their al
 **What is revealed:** Your yield percentage (you choose to share this)  
 **What stays hidden:** Your actual balance, holdings, wallet strategy, and shielded amount
 
+### Demo Flow
+
+1. Connect wallet
+2. Shield USDC
+3. Generate Alpha Proof
+4. View TEE attestation
+5. Share verify link
+6. Third party verifies proof at `/verify/[proofId]`
+7. Optional: export Private Alpha Report
+8. Optional: compare on Alpha Arena leaderboard
+
 ## Feature Matrix
 
 | Feature | Status | Description |
@@ -94,6 +105,12 @@ In DeFi, every on-chain action is public. A great trader **cannot prove their al
 | **Alpha Proof (SHA-256)** | Live | `sha256(wallet + pnl + timestamp)` - deterministic, verifiable |
 | **Auto-Compute on Connect** | Live | Proof auto-generated from on-chain deposit events on wallet connect |
 | **Proof Verification** | Live | Anyone can independently recompute and verify the proof |
+| **Public Proof Verify Page** | Demo-ready | `/verify/[proofId]` verifies Alpha Proof links without exposing balance or holdings |
+| **TEE Attestation Badge** | Demo-ready | Native proof panel showing iExec Nox compute status, hidden inputs, and PnL-only output metadata |
+| **Private Alpha Report** | Demo-ready | Screenshot-ready PNG report with masked wallet, verified PnL, proof ID, and verify link |
+| **Alpha Arena Leaderboard** | Demo-ready | Sample private leaderboard ranking verified alpha without balance disclosure |
+| **Before/After Privacy Diff** | Demo-ready | Compact judge-facing panel showing privacy risk before and after OPAQUE |
+| **Proof Link Sharing** | Demo-ready | Alpha Cards include copy/open verify-link actions for public verification |
 | **ChainGPT AI Risk Audit** | Live | Real-time portfolio risk scoring via ChainGPT API |
 | **ChainGPT AI Chat** | Live | Interactive DeFi risk assistant (wallet connection required) |
 | **Live Activity Feed** | Live | Real-time shield/proof event stream |
@@ -179,6 +196,8 @@ Wallet connects
               ProofCard Component
               → Download as PNG
               → Copy Proof ID
+              → Copy / open public verify link
+              → Export Private Alpha Report
               → Share to Twitter/Discord
 ```
 
@@ -241,13 +260,13 @@ event UnwrapFinalized(address indexed receiver, bytes32 encryptedAmount, uint256
 ### Alpha Proof Construction
 
 ```typescript
-// src/lib/enclave-pnl.ts
-import crypto from 'crypto';
+// src/lib/proof.ts
 
-const proof = crypto
-  .createHash('sha256')
-  .update(`${walletAddress}${pnlValue}${timestamp}`)
-  .digest('hex');
+const proof = await generateAlphaProof({
+  wallet: walletAddress,
+  pnl: pnlValue,
+  timestamp,
+});
 
 // Result: "0xA3F9...9C21" (truncated for display)
 ```
@@ -497,6 +516,20 @@ Generate an Alpha Proof from on-chain deposit history. Only requires wallet addr
 
 > Optional: pass `initial` and `final` numeric values for manual override mode.
 
+### `GET /verify/[proofId]`
+
+Public Alpha Proof verification route. When a proof link includes `wallet`, `pnl`, and `ts` query parameters, the page recomputes:
+
+```text
+sha256(wallet + pnl + timestamp)
+```
+
+The verifier sees proof status, masked wallet, PnL percentage, timestamp, Arbitrum Sepolia network metadata, iExec Nox TEE demo attestation metadata, and ChainGPT risk layer labeling. Balance, holdings, strategy, and shielded amount are never shown.
+
+### `GET /leaderboard`
+
+Alpha Arena demo leaderboard. Uses sample proof registry data to show how traders can rank by verified PnL, risk-adjusted alpha, consistency, drawdown, and verification status while keeping balances hidden.
+
 ### `POST /api/chaingpt`
 
 **Chat Mode** - Ask ChainGPT a DeFi question:
@@ -543,6 +576,11 @@ Q2 2026  v0.1 (CURRENT)
             ChainGPT AI risk audit + interactive chat (wallet-gated)
             TEE Visualizer animation
             Alpha Card (PNG download / social share)
+            Public Proof Verify Page (/verify/[proofId])
+            TEE Attestation Badge + Private Alpha Report
+            Alpha Arena demo leaderboard
+            Before/After Privacy Diff
+            Proof link sharing actions
             Smart-Blur Privacy UI (████ ████ reveal on demand)
             RainbowKit wallet connection (MetaMask + WalletConnect)
             Light/dark theme system + mobile responsive UI

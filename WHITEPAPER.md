@@ -74,9 +74,9 @@ Anyone who receives an Alpha Proof can independently reconstruct the hash from p
 ```
 1. Trader shields ERC-20 assets into OpaqueVault (on-chain, public)
 2. iExec Nox Enclave computes net yield privately (off-chain, sealed)
-3. OPAQUE issues a signed Alpha Proof (hash of wallet+initial+pnl)
-4. Trader shares proof on-chain or socially
-5. Anyone verifies: sha256(wallet + initial + pnl) === proof_id ✓
+3. OPAQUE issues an Alpha Proof (hash of wallet+pnl+timestamp)
+4. Trader shares proof on-chain, socially, or through a public verify link
+5. Anyone verifies: sha256(wallet + pnl + timestamp) === proof_id
 ```
 
 ---
@@ -113,13 +113,13 @@ User Input (initial, final, wallet)
           │               └── [Inside SGX] pnl = (final - initial) / initial × 100
           │
           ├── SHA-256 Hasher
-          │       └── proof = sha256(wallet + initial + pnl)
+          │       └── proof = sha256(wallet + pnl + timestamp)
           │
           └── Response { pnl, proof }
                     │
                     ▼
             ProofCard Component
-            (Verifiable Alpha Card, downloadable PNG)
+            (Verifiable Alpha Card, public verify link, downloadable PNG)
 ```
 
 ---
@@ -202,24 +202,20 @@ contract OpaqueVault is Ownable {
 
 ### 7.1 Alpha Proof Construction
 
-OPAQUE generates a **deterministic, reproducible Alpha Proof** using the Node.js native `crypto` module:
+OPAQUE generates a **deterministic, reproducible Alpha Proof** with SHA-256:
 
 ```typescript
-// src/app/api/compute/route.ts
-import crypto from 'crypto';
+// src/lib/proof.ts
 
-const proof = crypto
-  .createHash('sha256')
-  .update(`${wallet}${initial}${pnl}`)
-  .digest('hex');
+const proof = sha256(`${wallet.toLowerCase()}${pnl}${timestamp}`);
 ```
 
 ### 7.2 Verification
 
 Any third party can verify an Alpha Proof by:
 
-1. Obtaining `{wallet, initial, pnl}` from the prover (these are public assertions, not secret)
-2. Computing: `sha256(wallet + initial.toString() + pnl.toString())`
+1. Obtaining `{wallet, pnl, timestamp}` from the prover (these are public assertions, not secret)
+2. Computing: `sha256(wallet + pnl + timestamp)`
 3. Comparing to the published `proof_id`
 
 If they match → the PnL claim is authentic.  
@@ -317,6 +313,10 @@ Q2 2026 ─── v0.1 (NOW)
              ✅ ChainGPT risk audit + AI chat
              ✅ TEE Visualizer UI
              ✅ Alpha Card (download PNG / share)
+             ✅ Public Proof Verify Page (/verify/[proofId])
+             ✅ TEE Attestation Badge + Private Alpha Report
+             ✅ Alpha Arena demo leaderboard
+             ✅ Before/After Privacy Diff
 
 Q3 2026 ─── v0.2
              ◻ Stealth deposit addresses (mask shield() events)

@@ -3,13 +3,26 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAccount } from "wagmi";
-import { Loader2 } from "lucide-react";
+import { Cpu, Eye, Fingerprint, Loader2, Lock, ShieldCheck } from "lucide-react";
 import { ProofCard } from "@/components/ProofCard";
+import { PrivateAlphaReport } from "@/components/PrivateAlphaReport";
+import { PrivacyRiskDiff } from "@/components/PrivacyRiskDiff";
+import { buildVerifyPath } from "@/lib/proof";
+
+type ComputeResult = { pnl: string; proof: string; verification_timestamp?: number; deposits_analysed?: number };
 
 const LOADING_STEPS = [
   { msg: "Reading on-chain deposit events...", icon: "▣" },
   { msg: "Fetching live asset prices...",      icon: "◈" },
   { msg: "Generating TEE attestation proof...", icon: "◇" },
+];
+
+const COMPUTE_FLOW_STEPS = [
+  { title: "Capture Wallet State", sub: "Read wallet address and shield events", icon: Fingerprint },
+  { title: "Encrypt Balance Input", sub: "Seal inputs before confidential compute", icon: Lock },
+  { title: "Execute in iExec Nox TEE", sub: "Run PnL calculation inside enclave", icon: Cpu },
+  { title: "Generate Deterministic Proof", sub: "Hash wallet + PnL + timestamp", icon: ShieldCheck },
+  { title: "Publish Verifiable Alpha", sub: "Reveal proof link, keep balance hidden", icon: Eye },
 ];
 
 const HOW_IT_WORKS_ICONS = [
@@ -37,6 +50,137 @@ const HOW_IT_WORKS = [
   { n: "03", title: "Only Result is Revealed",body: "The yield percentage exits the enclave. Your balance, positions, and wallet history stay completely hidden." },
 ];
 
+function ConfidentialComputeFlowPanel({
+  loading,
+  loadingStep,
+  result,
+}: {
+  loading: boolean;
+  loadingStep: number;
+  result: ComputeResult | null;
+}) {
+  const activeIndex = result ? COMPUTE_FLOW_STEPS.length - 1 : loading ? Math.min(loadingStep + 1, COMPUTE_FLOW_STEPS.length - 2) : 0;
+
+  return (
+    <div style={{ background: "var(--surface)", border: "1px solid var(--border-strong)", padding: "24px", position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", top: 0, right: 0, padding: "14px", color: "rgba(0,0,255,0.04)", fontSize: "82px", lineHeight: 0.7, pointerEvents: "none", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900 }}>TEE</div>
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", marginBottom: "18px" }}>
+          <div>
+            <div className="bc" style={{ fontSize: "20px", color: "var(--foreground)", textTransform: "uppercase", letterSpacing: "1px" }}>
+              Confidential Compute Flow
+            </div>
+            <div className="mono" style={{ fontSize: "9px", color: "#0000FF", marginTop: "4px", letterSpacing: "2px", textTransform: "uppercase" }}>
+              Wallet state → Nox enclave → Proof link
+            </div>
+          </div>
+          <div className="mono" style={{ fontSize: "9px", color: result ? "#4ade80" : loading ? "#0000FF" : "var(--text-faint)", border: `1px solid ${result ? "rgba(74,222,128,0.25)" : loading ? "rgba(0,0,255,0.3)" : "var(--border)"}`, background: result ? "rgba(74,222,128,0.05)" : loading ? "rgba(0,0,255,0.08)" : "transparent", padding: "5px 8px", letterSpacing: "1px", textTransform: "uppercase", flexShrink: 0 }}>
+            {result ? "Proof Ready" : loading ? "Running" : "Standby"}
+          </div>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          {COMPUTE_FLOW_STEPS.map((step, index) => {
+            const Icon = step.icon;
+            const isDone = !!result || (loading && index < activeIndex);
+            const isActive = !result && index === activeIndex;
+            const color = isDone ? "#4ade80" : isActive ? "#0000FF" : "var(--border-soft)";
+
+            return (
+              <div
+                key={step.title}
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "38px 1fr auto",
+                  gap: "12px",
+                  alignItems: "center",
+                  padding: "12px",
+                  background: isActive ? "rgba(0,0,255,0.08)" : "var(--surface-alt)",
+                  border: `1px solid ${isActive ? "rgba(0,0,255,0.35)" : isDone ? "rgba(74,222,128,0.16)" : "var(--border)"}`,
+                  boxShadow: isActive ? "inset 0 0 18px rgba(0,0,255,0.04)" : "none",
+                }}
+              >
+                <div style={{ width: "34px", height: "34px", border: `1px solid ${isActive ? "#0000FF" : "var(--border)"}`, background: isActive ? "rgba(0,0,255,0.12)" : "transparent", color, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Icon size={16} />
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div className="bc" style={{ fontSize: "14px", color: isActive || isDone ? "var(--foreground)" : "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    {step.title}
+                  </div>
+                  <div className="mono" style={{ fontSize: "9px", color: "var(--text-faint)", marginTop: "3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {step.sub}
+                  </div>
+                </div>
+                <div className="mono" style={{ fontSize: "9px", color, letterSpacing: "1px" }}>
+                  {isDone ? "DONE" : isActive ? "ACTIVE" : "LOCKED"}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function VaultStatusOverview({ result, loading }: { result: ComputeResult | null; loading: boolean }) {
+  const statusItems = [
+    { label: "Shielded Balance", value: "Hidden", color: "#0000FF" },
+    { label: "Current PnL", value: result?.pnl ?? "+0.00%", color: result?.pnl?.startsWith("-") ? "#ff4444" : "#00ccff" },
+    { label: "Proof Status", value: result ? "Verified" : loading ? "Pending" : "Pending", color: result ? "#4ade80" : "#facc15" },
+    { label: "Privacy Mode", value: "Active", color: "#4ade80" },
+  ];
+
+  return (
+    <div style={{ background: "var(--surface-alt)", border: "1px solid var(--border-strong)", padding: "20px" }}>
+      <div className="bc" style={{ fontSize: "18px", color: "var(--foreground)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "14px" }}>
+        Vault Status Overview
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px" }}>
+        {statusItems.map(item => (
+          <div key={item.label} style={{ background: "var(--surface)", border: "1px solid var(--border)", padding: "12px", minWidth: 0 }}>
+            <div className="mono" style={{ fontSize: "8px", color: "var(--text-faint)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
+              {item.label}
+            </div>
+            <div className="bc" style={{ fontSize: "20px", color: item.color, textTransform: "uppercase", letterSpacing: "0.5px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {item.value}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PrivacyGuaranteesPanel() {
+  const guarantees = [
+    "Balance hidden",
+    "Holdings hidden",
+    "Strategy hidden",
+    "Only PnL revealed",
+    "Proof publicly verifiable",
+  ];
+
+  return (
+    <div style={{ background: "rgba(0,0,255,0.035)", border: "1px solid rgba(0,0,255,0.18)", padding: "20px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "14px" }}>
+        <div style={{ width: "8px", height: "8px", background: "#0000FF", boxShadow: "0 0 8px #0000FF" }} />
+        <div className="bc" style={{ fontSize: "18px", color: "var(--foreground)", textTransform: "uppercase", letterSpacing: "1px" }}>
+          Privacy Guarantees
+        </div>
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+        {guarantees.map(item => (
+          <div key={item} className="mono" style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontSize: "9px", color: "var(--text-dim)", border: "1px solid rgba(0,0,255,0.2)", background: "rgba(0,0,255,0.04)", padding: "7px 9px", letterSpacing: "0.5px", textTransform: "uppercase" }}>
+            <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: item === "Only PnL revealed" ? "#00ccff" : "#4ade80" }} />
+            {item}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function ComputeVaultPage() {
   const { address, isConnected } = useAccount();
   const [mounted, setMounted] = useState(false);
@@ -44,7 +188,7 @@ export default function ComputeVaultPage() {
 
   const [loading, setLoading]         = useState(false);
   const [loadingStep, setLoadingStep] = useState(0);
-  const [result, setResult]           = useState<{ pnl: string; proof: string; deposits_analysed?: number } | null>(null);
+  const [result, setResult]           = useState<ComputeResult | null>(null);
   const [shareMode, setShareMode]     = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [showManual, setShowManual]   = useState(false);
@@ -61,7 +205,7 @@ export default function ComputeVaultPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mounted, isConnected, address]);
 
-  const handleCompute = async (manual = false) => {
+  async function handleCompute(manual = false) {
     if (!address) return;
     setLoading(true);
     setError(null);
@@ -95,15 +239,15 @@ export default function ComputeVaultPage() {
         const key = `opaque_proofs_${address.toLowerCase()}`;
         try {
           const prev = JSON.parse(localStorage.getItem(key) || "[]");
-          prev.unshift({ pnl: data.pnl, initial: body.initial, final: body.final, ts: Date.now() });
+          prev.unshift({ pnl: data.pnl, proof: data.proof, verification_timestamp: data.verification_timestamp, initial: body.initial, final: body.final, ts: Date.now() });
           localStorage.setItem(key, JSON.stringify(prev.slice(0, 100)));
         } catch {}
       }
-    } catch (e: any) {
-      setError(e.message ?? "Something went wrong");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Something went wrong");
     }
     setLoading(false);
-  };
+  }
 
   const handleDownload = async () => {
     if (!cardRef.current) return;
@@ -118,6 +262,16 @@ export default function ComputeVaultPage() {
     a.click();
   };
 
+  const verifyPath = result && address
+    ? buildVerifyPath(
+        result.proof,
+        result.verification_timestamp
+          ? { wallet: address, pnl: result.pnl, timestamp: result.verification_timestamp }
+          : undefined
+      )
+    : "";
+  const verifyUrl = verifyPath && typeof window !== "undefined" ? `${window.location.origin}${verifyPath}` : verifyPath;
+
   // Share fullscreen
   if (shareMode && result) {
     return (
@@ -131,7 +285,7 @@ export default function ComputeVaultPage() {
             ALPHA CARD — READY TO SHARE
           </div>
           <div ref={cardRef}>
-            <ProofCard pnl={result.pnl} proof={result.proof} wallet={address!} isCapturing={isCapturing} />
+            <ProofCard pnl={result.pnl} proof={result.proof} wallet={address!} timestamp={result.verification_timestamp} isCapturing={isCapturing} />
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "20px" }}>
             <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={handleDownload} className="mono"
@@ -139,7 +293,7 @@ export default function ComputeVaultPage() {
               ⬇ DOWNLOAD PNG
             </motion.button>
             <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-              onClick={() => navigator.clipboard.writeText(`🔒 OPAQUE — Proof of Alpha\n\nVerified Yield: ${result.pnl}\nProof: 0x${result.proof.slice(0, 20)}...\n\n✓ Deterministic · iExec Nox TEE\n#DeFi #ProofOfAlpha #OPAQUE`)}
+              onClick={() => navigator.clipboard.writeText(`OPAQUE - Proof of Alpha\n\nVerified Yield: ${result.pnl}\nProof: 0x${result.proof.slice(0, 20)}...\nVerify: ${verifyUrl}\n\nDeterministic SHA-256 + iExec Nox TEE demo metadata\n#DeFi #ProofOfAlpha #OPAQUE`)}
               className="mono"
               style={{ padding: "16px", background: "transparent", color: "var(--text-dim)", border: "1px solid var(--border-soft)", fontSize: "12px", cursor: "pointer", letterSpacing: "1px" }}>
               📋 COPY TEXT
@@ -184,6 +338,7 @@ export default function ComputeVaultPage() {
       <div className="dash-grid-2">
 
         {/* Left: Status + Controls */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px", minWidth: 0 }}>
         <div style={{ background: "var(--surface)", border: "1px solid var(--border-strong)", padding: "40px", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: 0, right: 0, padding: "16px", color: "rgba(0,0,255,0.04)", fontSize: "110px", lineHeight: 0.5, pointerEvents: "none", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900 }}>OPQ</div>
 
@@ -299,6 +454,10 @@ export default function ComputeVaultPage() {
             </div>
           )}
         </div>
+        <ConfidentialComputeFlowPanel loading={loading} loadingStep={loadingStep} result={result} />
+        <VaultStatusOverview result={result} loading={loading} />
+        <PrivacyGuaranteesPanel />
+        </div>
 
         {/* Right: Proof Card */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,255,0.01)", border: "1px dashed var(--border-strong)", minHeight: "380px" }}>
@@ -344,7 +503,7 @@ export default function ComputeVaultPage() {
             ) : (
               <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ width: "100%", padding: "24px" }}>
                 <div ref={cardRef}>
-                  <ProofCard pnl={result.pnl} proof={result.proof} wallet={address!} onDownload={handleDownload} isCapturing={isCapturing} />
+                  <ProofCard pnl={result.pnl} proof={result.proof} wallet={address!} timestamp={result.verification_timestamp} onDownload={handleDownload} isCapturing={isCapturing} />
                 </div>
                 <motion.button
                   whileHover={{ scale: 1.01, boxShadow: "0 0 20px rgba(0,0,255,0.3)" }}
@@ -355,11 +514,19 @@ export default function ComputeVaultPage() {
                 >
                   {"📤 OPEN SHARE MODE ↗︎"}
                 </motion.button>
+                <PrivateAlphaReport
+                  wallet={address!}
+                  pnl={result.pnl}
+                  proof={result.proof}
+                  timestamp={result.verification_timestamp}
+                />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </div>
+
+      <PrivacyRiskDiff compact />
     </div>
   );
 }

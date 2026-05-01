@@ -1,8 +1,10 @@
-/* eslint-disable */
 "use client";
 
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Copy, ExternalLink } from "lucide-react";
+import { TEEAttestationBadge } from "@/components/TEEAttestationBadge";
+import { buildVerifyPath, normalizeProofId } from "@/lib/proof";
 
 // ─── Animated encrypted balance hook ──────────────────────────────────────────
 const ENC_CHARS = ["█", "▓", "▒", "░", "◉", "Ø", "#", "ψ", "Σ", "X"];
@@ -53,7 +55,7 @@ function ProofTooltip() {
           >
             <div style={{ fontSize: "9px", color: "var(--text-muted)", fontFamily: "'Share Tech Mono', monospace", lineHeight: 1.8 }}>
               <div style={{ color: "#0000FF", marginBottom: "4px", fontSize: "10px" }}>Proof Algorithm</div>
-              <code style={{ color: "var(--foreground)", fontSize: "10px" }}>sha256(wallet + initial + pnl)</code>
+              <code style={{ color: "var(--foreground)", fontSize: "10px" }}>sha256(wallet + pnl + timestamp)</code>
               <div style={{ marginTop: "8px", color: "var(--text-faint)" }}>Deterministic — same inputs always produce the same proof. Anyone can verify.</div>
             </div>
           </motion.div>
@@ -68,18 +70,30 @@ interface ProofCardProps {
   pnl: string;
   proof: string;
   wallet: string;
+  timestamp?: number;
   onDownload?: () => void;
   isCapturing?: boolean;
 }
 
-export function ProofCard({ pnl, proof, wallet, onDownload, isCapturing = false }: ProofCardProps) {
+export function ProofCard({ pnl, proof, wallet, timestamp, onDownload, isCapturing = false }: ProofCardProps) {
   const [mode, setMode] = useState<'private' | 'public'>('public');
   const [verifyState, setVerifyState] = useState<'idle' | 'verifying' | 'verified'>('idle');
+  const [copied, setCopied] = useState<string | null>(null);
   const encBalance = useAsciiBlur("████████", true);
   const encPnl = useAsciiBlur("██████", mode === 'private' && !isCapturing);
   
   const isProfit = pnl.startsWith("+");
   const shortenWallet = (w: string) => `${w.slice(0, 6)}...${w.slice(-4)}`;
+  const verifyPath = timestamp
+    ? buildVerifyPath(proof, { wallet, pnl, timestamp })
+    : `/verify/${normalizeProofId(proof)}`;
+  const verifyUrl = typeof window === "undefined" ? verifyPath : `${window.location.origin}${verifyPath}`;
+
+  const copyValue = async (label: string, value: string) => {
+    await navigator.clipboard.writeText(value);
+    setCopied(label);
+    window.setTimeout(() => setCopied(null), 1200);
+  };
 
   const handleVerify = async () => {
     setVerifyState('verifying');
@@ -231,6 +245,10 @@ export function ProofCard({ pnl, proof, wallet, onDownload, isCapturing = false 
               </div>
             ))}
           </motion.div>
+
+          <div style={{ marginTop: "16px" }}>
+            <TEEAttestationBadge proofHash={proof} timestamp={timestamp} compact expandable={false} />
+          </div>
         </div>
 
         {/* Divider */}
@@ -264,7 +282,11 @@ export function ProofCard({ pnl, proof, wallet, onDownload, isCapturing = false 
              </div>
              <div className="mono" style={{ fontSize: "10px", color: "var(--text-muted)", display: "flex", justifyContent: "space-between" }}>
                <span>Formula:</span>
-               <span style={{ color: "var(--foreground)", background: "var(--surface-alt)", padding: "2px 6px" }}>Proof = SHA256(wallet + initial + pnl)</span>
+               <span style={{ color: "var(--foreground)", background: "var(--surface-alt)", padding: "2px 6px" }}>Proof = SHA256(wallet + pnl + timestamp)</span>
+             </div>
+             <div className="mono" style={{ fontSize: "10px", color: "var(--text-muted)", display: "flex", justifyContent: "space-between", gap: "12px" }}>
+               <span>Verify:</span>
+               <span style={{ color: "#0000FF", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "220px" }}>{mode === 'public' ? verifyPath : "private mode"}</span>
              </div>
            </div>
 
@@ -293,7 +315,33 @@ export function ProofCard({ pnl, proof, wallet, onDownload, isCapturing = false 
            </div>
         </div>
 
-        {onDownload && (
+        {!isCapturing && (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: "8px", marginTop: "16px" }}>
+            <button
+              onClick={() => copyValue("proof", `0x${normalizeProofId(proof)}`)}
+              className="mono"
+              style={{ padding: "8px 10px", background: "rgba(0,0,255,0.08)", border: "1px solid rgba(0,0,255,0.25)", color: "#0000FF", fontSize: "9px", cursor: "pointer", letterSpacing: "1px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+            >
+              <Copy size={11} /> {copied === "proof" ? "COPIED" : "COPY PROOF ID"}
+            </button>
+            <button
+              onClick={() => copyValue("link", verifyUrl)}
+              className="mono"
+              style={{ padding: "8px 10px", background: "rgba(0,0,255,0.08)", border: "1px solid rgba(0,0,255,0.25)", color: "#0000FF", fontSize: "9px", cursor: "pointer", letterSpacing: "1px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+            >
+              <Copy size={11} /> {copied === "link" ? "COPIED" : "COPY VERIFY LINK"}
+            </button>
+            <button
+              onClick={() => window.open(verifyPath, "_blank", "noopener,noreferrer")}
+              className="mono"
+              style={{ padding: "8px 10px", background: "transparent", border: "1px solid var(--border-soft)", color: "var(--text-dim)", fontSize: "9px", cursor: "pointer", letterSpacing: "1px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px" }}
+            >
+              <ExternalLink size={11} /> OPEN VERIFY PAGE
+            </button>
+          </div>
+        )}
+
+        {onDownload && !isCapturing && (
           <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "16px" }}>
             <button
               onClick={onDownload}

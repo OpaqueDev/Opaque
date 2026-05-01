@@ -12,9 +12,9 @@
  *      — raw balances are never included in the output
  */
 
-import crypto from "crypto";
 import { createPublicClient, http, parseAbiItem, formatUnits } from "viem";
 import { arbitrumSepolia } from "viem/chains";
+import { generateAlphaProof } from "@/lib/proof";
 
 // ── On-chain config ────────────────────────────────────────────────────────────
 const VAULT_ADDRESS = (process.env.NEXT_PUBLIC_VAULT_ADDRESS ?? "") as `0x${string}`;
@@ -168,15 +168,19 @@ async function computePnL(
 }
 
 // ── 5. Deterministic proof hash (TEE attestation simulation) ─────────────────
-function buildProofHash(
+async function buildProofHash(
   wallet: string,
   initialValueUSD: number,
   pnlPercentage: number,
   timestamp: number
-): string {
+): Promise<string> {
   // Only the result exits the enclave — never raw balances
-  const payload = `${wallet}|${pnlPercentage.toFixed(6)}|${timestamp}`;
-  return crypto.createHash("sha256").update(payload).digest("hex");
+  void initialValueUSD;
+  return generateAlphaProof({
+    wallet,
+    pnl: `${pnlPercentage >= 0 ? "+" : ""}${pnlPercentage.toFixed(2)}`,
+    timestamp,
+  });
 }
 
 // ── Main export: fetchAndComputePnL ───────────────────────────────────────────
@@ -210,7 +214,7 @@ export async function fetchAndComputePnL(
     ? ((currentValueUSD - initialValueUSD) / initialValueUSD) * 100
     : 0;
 
-  const proof_hash = buildProofHash(wallet, initialValueUSD, pnlPercentage, timestamp);
+  const proof_hash = await buildProofHash(wallet, initialValueUSD, pnlPercentage, timestamp);
 
   // Format display string — raw balances are NOT returned
   const sign       = pnlPercentage >= 0 ? "+" : "";

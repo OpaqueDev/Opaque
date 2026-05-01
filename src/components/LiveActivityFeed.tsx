@@ -24,8 +24,10 @@ function randomActivity() {
   return { verb, token, amount, status, addr, ts: new Date().toLocaleTimeString() };
 }
 
+type ActivityItem = ReturnType<typeof randomActivity>;
+
 export default function LiveActivityFeed() {
-  const [feed, setFeed] = useState<any[]>([]);
+  const [feed, setFeed] = useState<ActivityItem[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

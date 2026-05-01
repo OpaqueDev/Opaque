@@ -57,7 +57,7 @@ export default function DocsPage() {
             <Lock color="#0000FF" size={32} style={{ marginBottom: "20px" }} />
             <h3 className="bc" style={{ fontSize: "24px", marginBottom: "12px" }}>SHA-256 Attestation</h3>
             <p style={{ color: "#aaa", fontSize: "15px", lineHeight: 1.6 }}>
-              The protocol outputs a deterministic hash: <code>sha256(wallet + initial + pnl)</code>. Anyone can independently verify this hash if you provide the inputs, but no one can reverse-engineer your balance from the proof ID alone.
+              The protocol outputs a deterministic hash: <code>sha256(wallet + pnl + timestamp)</code>. Anyone can independently verify this hash if you provide the proof inputs, but no one can reverse-engineer your balance from the proof ID alone.
             </p>
           </div>
 
@@ -101,7 +101,7 @@ export default function DocsPage() {
                 <div style={{ background: "#0000FF", color: "#fff", width: "40px", height: "40px", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>3</div>
                 <div style={{ flex: 1, background: "#111", border: "1px solid #333", padding: "20px" }}>
                   <h4 className="mono" style={{ color: "#0000FF", marginBottom: "8px" }}>ATTEST</h4>
-                  <p style={{ color: "#aaa", fontSize: "14px" }}>Enclave generates deterministic proof: <code>sha256(wallet + initial + pnl)</code>.</p>
+                  <p style={{ color: "#aaa", fontSize: "14px" }}>Enclave generates deterministic proof: <code>sha256(wallet + pnl + timestamp)</code>.</p>
                 </div>
               </div>
 
@@ -179,7 +179,7 @@ event AssetUnshielded(address indexed recipient, address indexed token, uint256 
   "pnl": 43.5,
   "proofId": "0xA3F9...9C21",
   "timestamp": 1714000000000,
-  "formula": "sha256(wallet + initial + pnl)"
+  "formula": "sha256(wallet + pnl + timestamp)"
 }`}
           </pre>
         </div>

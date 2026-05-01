@@ -23,7 +23,7 @@ export async function POST(req: Request) {
       verification_timestamp: result.verification_timestamp,
       deposits_analysed:      result.deposits_analysed,
     });
-  } catch (e: any) {
+  } catch (e: unknown) {
     console.error("Compute error:", e);
     return NextResponse.json({ error: "Computation failed" }, { status: 500 });
   }

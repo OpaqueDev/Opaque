@@ -12,6 +12,11 @@ import type { WalletClient } from "viem";
 
 export type NoxClient = Awaited<ReturnType<typeof createNoxClient>>;
 
+type NoxClientWithDecrypt = NoxClient & {
+  decrypt(handle: `0x${string}`): Promise<{ value: string | number | bigint }>;
+  publicDecrypt(handle: `0x${string}`): Promise<{ value: string | number | bigint; decryptionProof: `0x${string}` }>;
+};
+
 export async function createNoxClient(walletClient: WalletClient) {
   const { createViemHandleClient } = await import("@iexec-nox/handle");
   return createViemHandleClient(walletClient);
@@ -34,8 +39,8 @@ export async function decryptBalance(
   client: NoxClient,
   handle: `0x${string}`
 ): Promise<bigint> {
-  const { value } = await (client as any).decrypt(handle);
-  return BigInt(value as string | number);
+  const { value } = await (client as NoxClientWithDecrypt).decrypt(handle);
+  return BigInt(value);
 }
 
 // Publicly decrypt a handle that was marked with allowPublicDecryption (unwrapRequestId)
@@ -43,9 +48,9 @@ export async function publicDecryptHandle(
   client: NoxClient,
   handle: `0x${string}`
 ): Promise<{ value: bigint; decryptionProof: `0x${string}` }> {
-  const { value, decryptionProof } = await (client as any).publicDecrypt(handle);
+  const { value, decryptionProof } = await (client as NoxClientWithDecrypt).publicDecrypt(handle);
   return {
-    value:           BigInt(value as string | number),
+    value:           BigInt(value),
     decryptionProof: decryptionProof as `0x${string}`,
   };
 }
