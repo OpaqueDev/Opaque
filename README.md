@@ -34,7 +34,8 @@
 13. [Deployment](#deployment)
 14. [API Reference](#api-reference)
 15. [Roadmap](#roadmap)
-16. [Contributing](#contributing)
+16. [Confidential Yield Optimizer *(Vision)*](#confidential-yield-optimizer-vision)
+17. [Contributing](#contributing)
 
 ## What is OPAQUE?
 
@@ -564,6 +565,129 @@ Alpha Arena demo leaderboard. Uses sample proof registry data to show how trader
 
 > **Credit cost:** 0.5 credits per call. Chat history disabled by default to save credits.
 
+## Confidential Yield Optimizer *(Vision)*
+
+> **Status: Concept / Planned Feature — no existing code or UI has been changed.**
+
+### What Is It?
+
+OPAQUE evolves from a private proof vault into a **confidential yield intelligence layer**.
+
+Using iExec Nox and confidential tokens, OPAQUE can privately evaluate yield opportunities without ever exposing a user's balance, allocation size, or strategy. The system analyses APY, gas cost, risk score, and liquidity depth inside the TEE — then produces a **privacy-preserving yield recommendation**.
+
+> _"Before: Prove alpha without revealing balance.  
+> After: Generate alpha privately, then prove it publicly."_
+
+---
+
+### Feature Name
+
+**Confidential Yield Optimizer**  
+*Powered by Stealth Auto-Compounder*
+
+Alternative names considered:
+
+| Name | Notes |
+|------|-------|
+| **Confidential Yield Optimizer** | Most professional — preferred for docs/pitches |
+| **Stealth Auto-Compounder** | Most catchy — preferred for demo/marketing |
+| Private Yield Agent | Simple and clear |
+| Nox Yield Agent | Good if highlighting iExec/Nox |
+| Shadow Rebalance Engine | Cool, slightly too edgy |
+
+---
+
+### Two Modes
+
+| Mode | Description | Status |
+|------|-------------|--------|
+| **Signal Mode** | AI recommends a yield route. User reviews and executes manually. | Planned MVP |
+| **Stealth Auto Mode** | User grants permissioned strategy access; OPAQUE rebalances shielded assets automatically when expected yield improvement exceeds gas cost + risk threshold. | Future — **Coming Soon** |
+
+> **Important:** Stealth Auto Mode will not be presented as live until it is fully implemented and audited.
+> For the hackathon MVP, **Signal Mode is the target scope**.
+
+---
+
+### Signal Mode — Flow
+
+```
+1. SHIELD     User shields USDC → wcUSDC (existing flow, unchanged)
+2. SCAN       OPAQUE privately scans yield opportunities (inside TEE)
+3. SCORE      TEE computes opportunity score: APY, gas, risk, liquidity depth
+4. RECOMMEND  Dashboard shows recommendation (balance + allocation stay hidden)
+              "Move 40% to Pool A — expected APY +12.4%, gas-adjusted gain +3.1%"
+5. EXECUTE    User clicks "Review Strategy" → "Execute" (manual approval always required)
+6. PROVE      After yield runs, OPAQUE generates Alpha Proof (existing Proof flow)
+```
+
+**What is revealed:** Yield recommendation (APY estimate, risk score, suggested route)  
+**What stays hidden:** Balance, allocation size, strategy details, individual pool amounts
+
+---
+
+### Planned Dashboard Panel (UI Mockup — Not Yet Implemented)
+
+```
+╔══════════════════════════════════════════════════╗
+║  CONFIDENTIAL YIELD OPTIMIZER                   ║
+║  Powered by Stealth Auto-Compounder             ║
+╠══════════════════════════════════════════════════╣
+║  Private Strategy Scan    Status: Active        ║
+║  Mode: Signal Only                              ║
+╠══════════════════════════════════════════════════╣
+║  Best Route:   USDC → Shielded Lending Pool     ║
+║  Expected APY: 12.4%              [SIMULATED]   ║
+║  Gas-adj Gain: +3.1%                            ║
+║  Risk Score:   B+                               ║
+╠══════════════════════════════════════════════════╣
+║  Privacy Status:                                ║
+║  ████ Balance Hidden                            ║
+║  ████ Holdings Hidden                           ║
+║  ████ Allocation Hidden                         ║
+║  ████ Strategy Hidden                           ║
+║  ✓ Only yield recommendation revealed           ║
+╠══════════════════════════════════════════════════╣
+║  [ Review Strategy ]  [ Copy Summary ]          ║
+║  [ Generate Alpha Proof ]                       ║
+╠══════════════════════════════════════════════════╣
+║  WHY THIS ROUTE?                                ║
+║  ✓ Higher APY than current allocation           ║
+║  ✓ Gas cost covered by projected gain           ║
+║  ✓ Risk score within user threshold             ║
+║  ✓ Strategy hidden inside confidential compute  ║
+╠══════════════════════════════════════════════════╣
+║  STEALTH AUTO MODE          [ Coming Soon ]     ║
+║  AI rebalances automatically when               ║
+║  expected gain > gas cost + risk buffer         ║
+╚══════════════════════════════════════════════════╝
+```
+
+---
+
+### What NOT to Claim (until implemented)
+
+| ❌ Do NOT say | ✅ Say instead |
+|--------------|----------------|
+| "AI automatically moves funds across Aave and Curve" | "OPAQUE recommends allocation routes inside the confidential compute layer" |
+| "Fully automated rebalancing is live" | "Stealth Auto Mode is a planned future upgrade" |
+| "Real yield rates from Aave/Curve are live" | "Demo values are simulated; real API integrations planned for v0.2" |
+
+---
+
+### Hackathon Narrative
+
+This feature maps directly to the hackathon challenge criteria:
+
+- **Confidential computing** — strategy evaluation happens inside iExec Nox TEE
+- **Programmable financial logic** — yield scoring rules are private algorithms
+- **Confidential tokens** — shielded USDC (wcUSDC / ERC-7984) is the base asset
+- **Runnable MVP** — Signal Mode is demonstrable without live fund movement
+- **Application value** — shows OPAQUE as a full DeFi intelligence layer, not just a proof tool
+- **Native deployment** — builds on existing `WrappedConfidentialUSDC` already deployed on Arbitrum Sepolia
+
+---
+
 ## Roadmap
 
 ```
@@ -592,6 +716,12 @@ Q3 2026  v0.2
             Alpha Badge NFT — minted on verified yield milestones (>50%, >100%)
             Multi-token vault support (expanded ERC-20 registry)
             Cross-chain bridge: Base + Optimism via Wormhole messaging
+            Confidential Yield Optimizer — Signal Mode MVP
+              → TEE-private yield opportunity scan
+              → Gas-adjusted APY recommendation panel
+              → User-approved manual execution
+              → Demo yield data (labeled as simulated)
+              → Alpha Proof generated after yield cycle
 
 Q4 2026  v1.0
             ZK-SNARK proofs — replace SHA-256 attestation with Groth16 circuits
@@ -600,6 +730,11 @@ Q4 2026  v1.0
             DAO governance activation — fee parameters, oracle rotation
             Institutional API access tier — batch proof verification, private dashboards
             Cross-chain expansion: zkSync Era, Polygon zkEVM
+            Confidential Yield Optimizer — Stealth Auto Mode (permissioned)
+              → User-granted strategy permissions
+              → Auto-rebalance when gain > gas + risk threshold
+              → Full TEE attestation of every rebalance action
+              → Strategy smart contract router (audited)
 
 2027     v2.0
             Solana integration via Wormhole for cross-ecosystem alpha proofs

@@ -152,6 +152,103 @@ function VaultStatusOverview({ result, loading }: { result: ComputeResult | null
   );
 }
 
+function ConfidentialYieldOptimizerTeaser() {
+  const routes = [
+    { pool: "Private Lending Pool A", apy: "12.4%", gain: "+3.1%", risk: "B+" },
+    { pool: "Stable Yield Pool B",    apy: "9.8%",  gain: "+1.7%", risk: "A-" },
+    { pool: "Shielded Reserve",       apy: "—",     gain: "—",     risk: "A+" },
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.15 }}
+      style={{
+        position: "relative",
+        background: "var(--surface)",
+        border: "1px solid var(--border-strong)",
+        padding: "28px 32px",
+        overflow: "hidden",
+        marginTop: "4px",
+      }}
+    >
+      {/* Watermark */}
+      <div style={{ position: "absolute", top: 0, right: 0, padding: "14px", color: "rgba(0,0,255,0.03)", fontSize: "88px", lineHeight: 0.8, pointerEvents: "none", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900 }}>YLD</div>
+
+      {/* Frosted overlay — "coming soon" lock */}
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "linear-gradient(135deg, rgba(4,4,13,0.72) 0%, rgba(0,0,255,0.06) 100%)",
+        backdropFilter: "blur(3px)",
+        zIndex: 10,
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        gap: "10px",
+        border: "1px solid rgba(0,0,255,0.15)",
+      }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0000FF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <div className="bc" style={{ fontSize: "20px", color: "var(--foreground)", textTransform: "uppercase", letterSpacing: "2px" }}>Coming Soon</div>
+          <div className="mono" style={{ fontSize: "9px", color: "#0000FF", letterSpacing: "3px", textTransform: "uppercase" }}>v0.2 · Signal Mode</div>
+        </div>
+        <div className="mono" style={{ fontSize: "10px", color: "var(--text-muted)", textAlign: "center", maxWidth: "320px", lineHeight: 1.7, marginTop: "4px" }}>
+          Strategy evaluation happens inside iExec Nox TEE.<br/>Only the recommendation is revealed. Balance, allocation,<br/>and strategy stay hidden.
+        </div>
+      </div>
+
+      {/* Blurred content behind overlay */}
+      <div style={{ filter: "blur(2px)", pointerEvents: "none", userSelect: "none" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", marginBottom: "18px" }}>
+          <div>
+            <div className="bc" style={{ fontSize: "20px", color: "var(--foreground)", textTransform: "uppercase", letterSpacing: "1px" }}>
+              Confidential Yield Optimizer
+            </div>
+            <div className="mono" style={{ fontSize: "9px", color: "#0000FF", marginTop: "4px", letterSpacing: "2px", textTransform: "uppercase" }}>
+              Stealth Auto-Compounder · Signal Mode
+            </div>
+          </div>
+          <div className="mono" style={{ fontSize: "9px", color: "var(--text-faint)", border: "1px solid var(--border)", padding: "5px 8px", letterSpacing: "1px", textTransform: "uppercase", flexShrink: 0 }}>
+            Scan: Active
+          </div>
+        </div>
+
+        {/* Simulated route table */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "18px" }}>
+          {routes.map((r) => (
+            <div key={r.pool} style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr auto", gap: "12px", alignItems: "center", padding: "11px 14px", background: "var(--surface-alt)", border: "1px solid var(--border)" }}>
+              <div className="mono" style={{ fontSize: "11px", color: "var(--text-dim)" }}>{r.pool}</div>
+              <div className="bc" style={{ fontSize: "13px", color: "#00ccff" }}>{r.apy}</div>
+              <div className="bc" style={{ fontSize: "13px", color: "#4ade80" }}>{r.gain}</div>
+              <div className="mono" style={{ fontSize: "11px", color: "var(--text-muted)" }}>{r.risk}</div>
+              <div className="mono" style={{ fontSize: "8px", color: "#0000FF", border: "1px solid rgba(0,0,255,0.2)", padding: "3px 7px", letterSpacing: "1px" }}>HIDDEN</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Privacy tags */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "18px" }}>
+          {["████ Balance Hidden", "████ Holdings Hidden", "████ Allocation Hidden", "████ Strategy Hidden", "✓ Recommendation Revealed"].map(tag => (
+            <div key={tag} className="mono" style={{ display: "inline-flex", alignItems: "center", gap: "7px", fontSize: "9px", color: "var(--text-dim)", border: "1px solid rgba(0,0,255,0.2)", background: "rgba(0,0,255,0.04)", padding: "7px 9px", letterSpacing: "0.5px", textTransform: "uppercase" }}>
+              <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: tag.startsWith("✓") ? "#4ade80" : "#0000FF" }} />
+              {tag}
+            </div>
+          ))}
+        </div>
+
+        {/* Dummy buttons */}
+        <div style={{ display: "flex", gap: "10px" }}>
+          {["Review Strategy", "Copy Summary", "Generate Alpha Proof"].map(label => (
+            <button key={label} disabled className="bc" style={{ padding: "11px 18px", background: label === "Review Strategy" ? "#0000FF" : "transparent", color: label === "Review Strategy" ? "#fff" : "var(--text-faint)", border: label === "Review Strategy" ? "none" : "1px solid var(--border)", fontSize: "13px", cursor: "not-allowed", letterSpacing: "0.5px", opacity: 0.7 }}>{label}</button>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 function PrivacyGuaranteesPanel() {
   const guarantees = [
     "Balance hidden",
@@ -526,6 +623,7 @@ export default function ComputeVaultPage() {
         </div>
       </div>
 
+      <ConfidentialYieldOptimizerTeaser />
       <PrivacyRiskDiff compact />
     </div>
   );
